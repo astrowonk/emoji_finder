@@ -1,5 +1,8 @@
 import pandas as pd
 from sentence_transformers import SentenceTransformer, util
+from nltk import WordNetLemmatizer
+
+w = WordNetLemmatizer()
 
 
 class EmojiFinder():
@@ -10,6 +13,7 @@ class EmojiFinder():
         self.model = SentenceTransformer('all-mpnet-base-v2')
 
     def top_emojis(self, search):
+        search = w.lemmatize(search)
         target = self.model.encode(search)
         tensor = util.cos_sim(target, self.score_array)
         locs = (-tensor.numpy()).argsort()[0][0:20]
@@ -21,8 +25,13 @@ class EmojiFinderCached():
     def __init__(self):
         self.emoji_df = pd.read_parquet('emoji_data.parquet')
         self.vocab_df = pd.read_parquet('vocab_df.parquet')
-        self.distances = pd.read_parquet('semantic_distances.parquet').values
+        self.distances = pd.read_parquet(
+            'semantic_distances_top25.parquet').values
 
     def top_emojis(self, search):
-        idx = self.vocab_df.query('word == @search')['idx'].iloc[0]
-        return self.emoji_df.iloc[(-self.distances[idx]).argsort()].head(20)
+        df = self.vocab_df.query('word == @search')
+        if not df.empty:
+            idx = df['idx'].iloc[0]
+            return self.emoji_df.iloc[(self.distances[idx])]
+        else:
+            return pd.DataFrame(columns=['text', 'emoji'])
