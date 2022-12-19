@@ -6,7 +6,7 @@ try:
 except LookupError:
     nltk.download('wordnet')
 
-w = nltk.WordNetLemmatizer()
+
 
 # class EmojiFinder():
 
@@ -30,8 +30,10 @@ class EmojiFinderCached():
         self.vocab_df = pd.read_parquet('vocab_df.parquet')
         self.distances = pd.read_parquet(
             'semantic_distances_top25.parquet').values
+        self.w = nltk.WordNetLemmatizer()
 
     def top_emojis(self, search):
+        search = self.w.lemmatize(search)
         df = self.vocab_df.query('word == @search')
         if not df.empty:
             idx = df['idx'].iloc[0]
