@@ -1,0 +1,4 @@
+pandas
+numpy
+sentence_transformers
+pyarrow
