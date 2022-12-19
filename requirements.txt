@@ -1,4 +1,4 @@
 pandas
 numpy
-sentence_transformers
+nltk
 pyarrow
