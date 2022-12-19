@@ -1,8 +1,13 @@
 import pandas as pd
 from sentence_transformers import SentenceTransformer, util
-from nltk import WordNetLemmatizer
+import nltk
 
-w = WordNetLemmatizer()
+try:
+    nltk.data.find('corpora/wordnet')
+except LookupError:
+    nltk.download('wordnet')
+
+w = nltk.WordNetLemmatizer()
 
 
 class EmojiFinder():
