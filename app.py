@@ -23,14 +23,14 @@ st.markdown(
     <style>
         div[data-testid="column"]:nth-of-type(1)
         {
-            text-align: end;
+            text-align: center;
             align-self: center;
             
         } 
 
         div[data-testid="column"]:nth-of-type(2)
         {
-            
+            text-align: center;
             
         } 
 
