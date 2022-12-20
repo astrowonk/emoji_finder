@@ -1,3 +1,5 @@
+"""Pre-generate needed model scores for emoji finding clasess."""
+
 from sentence_transformers import SentenceTransformer, util
 import pandas as pd
 import numpy as np
