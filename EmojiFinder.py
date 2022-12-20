@@ -31,8 +31,10 @@ class EmojiFinderCached():
         man_variants = [':man_' + base[1:] for base in variants]
         woman_variants = [':woman_' + base[1:] for base in variants]
 
-        return set(variants + man_variants + woman_variants).intersection(
-            self.emoji_df['label'].tolist())
+        return sorted(
+            list(
+                set(variants + man_variants + woman_variants).intersection(
+                    self.emoji_df['label'].tolist())))
 
     def top_emojis(self, search):
         search = self.w.lemmatize(search.strip().lower())

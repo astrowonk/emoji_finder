@@ -11,7 +11,8 @@ class ComputeDistances:
     def __init__(self, model_name) -> None:
         self.model_name = model_name
         self.emoji_data = pd.read_parquet(
-            'emoji_data.parquet')  # dataframe of emojis and their descriptions
+            'emoji_df_improved.parquet'
+        )  # dataframe of emojis and their descriptions
         self.model = SentenceTransformer(model_name)
         self.all_words = pd.read_csv('cleaned_wordlist_all.txt',
                                      header=None)[0].tolist()

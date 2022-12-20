@@ -74,8 +74,17 @@ st.markdown("""
             unsafe_allow_html=True)
 
 if search:
+
+    full_res = e.top_emojis(search)
+    res_list = full_res.to_dict('records')
+    variants = []
+    for rec in res_list:
+        variants.extend(e.add_variants(rec['label']))
+    ## remove variants from list
+    #full_res = full_res.query("label not in @variants")
+
     st.subheader("Results:")
-    for item in e.top_emojis(search)[['text', 'emoji']].to_dict('records'):
+    for item in full_res.to_dict('records'):
         with st.container():
             col1, col2 = st.columns(2)
             with col1:
