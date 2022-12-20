@@ -28,8 +28,10 @@ class EmojiFinderCached():
     def add_variants(self, base_label):
         base_search = base_label[1:-1]
         variants = [f":{base_search}_{x}:" for x in SKIN_TONE_SUFFIXES]
-        man_variants = [':man_' + base[1:] for base in variants]
-        woman_variants = [':woman_' + base[1:] for base in variants]
+        man_variants = [':man_' + base[1:]
+                        for base in variants] + [f':man_{base_search}:']
+        woman_variants = [':woman_' + base[1:]
+                          for base in variants] + [f':woman_{base_search}:']
 
         return sorted(
             list(

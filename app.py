@@ -81,7 +81,8 @@ if search:
     for rec in res_list:
         variants.extend(e.add_variants(rec['label']))
     ## remove variants from list
-    #full_res = full_res.query("label not in @variants")
+    print(variants)
+    full_res = full_res.query("label not in @variants")
 
     st.subheader("Results:")
     for item in full_res.to_dict('records'):
@@ -90,4 +91,8 @@ if search:
             with col1:
                 st.text(item['text'])
             with col2:
-                st.code(item['emoji'])
+                augment_emojis = [item['emoji']] + [
+                    e.emoji_dict[y] for y in e.add_variants(item['label'])
+                ]
+                for x in augment_emojis:
+                    st.code(x)
