@@ -23,18 +23,21 @@ except LookupError:
 
 class EmojiFinderCached():
 
-    def __init__(self):
+    def __init__(self, model_name='all-mpnet-base-v2'):
         self.emoji_df = pd.read_parquet('emoji_data.parquet')
-        self.vocab_df = pd.read_parquet('vocab_df.parquet')
+        self.emoji_dict = self.emoji_df.set_index('label')['emoji'].to_dict()
+        self.emoji_text_dict = self.emoji_df.set_index(
+            'label')['text'].to_dict()
+
+        vocab_df = pd.read_parquet(f'vocab_df_{model_name}.parquet')
+        self.vocab_dict = vocab_df.set_index('word')['idx'].to_dict()
         self.distances = pd.read_parquet(
-            'semantic_distances_top25.parquet').values
+            f'semantic_distances_{model_name}.parquet').values
         self.w = nltk.WordNetLemmatizer()
 
     def top_emojis(self, search):
         search = self.w.lemmatize(search.strip().lower())
-        df = self.vocab_df.query('word == @search')
-        if not df.empty:
-            idx = df['idx'].iloc[0]
+        if (idx := self.vocab_dict.get(search)):
             return self.emoji_df.iloc[(self.distances[idx])]
         else:
             return pd.DataFrame(columns=['text', 'emoji'])

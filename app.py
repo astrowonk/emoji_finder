@@ -18,21 +18,17 @@ e = make_class()
 search = st.text_input("Search")
 col1, col2 = st.columns(2)
 
-
 # Auto focus on input
-components.html(
-    f"""
+components.html(f"""
     <script>
         var input = window.parent.document.querySelector("input[type=text]");
         input.focus();
     </script>
     """,
-    width=10, height=0
-)
+                width=10,
+                height=0)
 
-
-st.markdown(
-    """
+st.markdown("""
     <style>
         div[data-testid="column"]:nth-of-type(1)
         {
@@ -74,11 +70,8 @@ st.markdown(
     </style>
 
 
-    """,unsafe_allow_html=True
-)
-
-
-
+    """,
+            unsafe_allow_html=True)
 
 if search:
     st.subheader("Results:")
@@ -89,6 +82,3 @@ if search:
                 st.text(item['text'])
             with col2:
                 st.code(item['emoji'])
-        
-
-

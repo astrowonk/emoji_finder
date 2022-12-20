@@ -9,10 +9,12 @@ except LookupError:
 
 class EmojiFinder():
 
-    def __init__(self):
+    def __init__(self,model_name='all-mpnet-base-v2'):
         self.emoji_df = pd.read_parquet('emoji_data.parquet')
-        self.score_array = pd.read_parquet('emoji_scores.parquet').values
-        self.model = SentenceTransformer('all-mpnet-base-v2')
+        self.score_array = pd.read_parquet(
+            f"emoji_vectors_{model_name}.parquet"
+        ).values  ## pre-computed encoded vectors for the list of emoji text
+        self.model = SentenceTransformer(model_name)
         self.w = nltk.WordNetLemmatizer()
 
     def top_emojis(self, search):
