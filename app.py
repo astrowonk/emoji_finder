@@ -51,13 +51,21 @@ st.markdown(
             padding-top: 0px;
         }
 
-        div.css-1n76uvr {
+        div[data-testid="stVerticalBlock"] {
             gap: 0em;
+            display: inline;
             }
 
         pre {
-            margin: 0.5em !important;
+            margin-top: 1em !important;
+            margin-bottom: 1em !important;
         }
+
+        div[data-testid="stText"] {
+            margin-top: 1em !important;
+            margin-bottom: 1em !important;
+            }
+
 
         div.block-container {
             padding: 3rem 1rem 10rem;
