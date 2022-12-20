@@ -6,8 +6,6 @@ try:
 except LookupError:
     nltk.download('wordnet')
 
-
-
 # class EmojiFinder():
 
 #     def __init__(self):
@@ -33,7 +31,7 @@ class EmojiFinderCached():
         self.w = nltk.WordNetLemmatizer()
 
     def top_emojis(self, search):
-        search = self.w.lemmatize(search)
+        search = self.w.lemmatize(search.strip().lower())
         df = self.vocab_df.query('word == @search')
         if not df.empty:
             idx = df['idx'].iloc[0]

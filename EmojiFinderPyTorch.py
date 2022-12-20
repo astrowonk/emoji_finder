@@ -16,7 +16,7 @@ class EmojiFinder():
         self.w = nltk.WordNetLemmatizer()
 
     def top_emojis(self, search):
-        search = self.w.lemmatize(search)
+        search = self.w.lemmatize(search.lower().strip())
         target = self.model.encode(search)
         tensor = util.cos_sim(target, self.score_array)
         locs = (-tensor.numpy()).argsort()[0][0:20]
