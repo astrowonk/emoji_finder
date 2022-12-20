@@ -17,8 +17,38 @@ e = make_class()
 search = st.text_input("Search")
 col1, col2 = st.columns(2)
 
+
+st.markdown(
+    """
+    <style>
+        div[data-testid="column"]:nth-of-type(1)
+        {
+            text-align: end;
+            align-self: center;
+            
+        } 
+
+        div[data-testid="column"]:nth-of-type(2)
+        {
+            
+            
+        } 
+
+
+    </style>
+    """,unsafe_allow_html=True
+)
+
+
 if search:
     st.subheader("Results:")
     for item in e.top_emojis(search)[['text', 'emoji']].to_dict('records'):
-        st.markdown(item['text'])
-        st.code(item['emoji'])
+        with st.container():
+            col1, col2 = st.columns(2)
+            with col1:
+                st.text(item['text'])
+            with col2:
+                st.code(item['emoji'])
+        
+
+
