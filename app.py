@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 from EmojiFinder import EmojiFinderCached
 
 st.set_page_config(page_title="Emoji Finder", )
@@ -18,6 +19,18 @@ search = st.text_input("Search")
 col1, col2 = st.columns(2)
 
 
+# Auto focus on input
+components.html(
+    f"""
+    <script>
+        var input = window.parent.document.querySelector("input[type=text]");
+        input.focus();
+    </script>
+    """,
+    width=10, height=0
+)
+
+
 st.markdown(
     """
     <style>
@@ -34,10 +47,29 @@ st.markdown(
             
         } 
 
+        h1, h3 {
+            padding-top: 0px;
+        }
+
+        div.css-1n76uvr {
+            gap: 0em;
+            }
+
+        pre {
+            margin: 0.5em !important;
+        }
+
+        div.block-container {
+            padding: 3rem 1rem 10rem;
+        }
 
     </style>
+
+
     """,unsafe_allow_html=True
 )
+
+
 
 
 if search:
