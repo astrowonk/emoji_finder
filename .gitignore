@@ -1,0 +1,7 @@
+.ipynb_checkpoints/
+*.ipynb
+__pycache__/
+words-common.txt
+semantic_distances_ful.parquet
+new_model.txt
+__pycache__/*
