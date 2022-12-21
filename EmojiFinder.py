@@ -25,6 +25,10 @@ class EmojiFinderCached():
             f'semantic_distances_{model_name}.parquet').values
         self.w = nltk.WordNetLemmatizer()
 
+    def filter_list(self, list1):
+        return sorted(
+            list(set(list1).intersection(self.emoji_df['label'].tolist())))
+
     def add_variants(self, base_label):
         base_search = base_label[1:-1]
         variants = [f":{base_search}_{x}:" for x in SKIN_TONE_SUFFIXES]
@@ -33,10 +37,8 @@ class EmojiFinderCached():
         woman_variants = [':woman_' + base[1:]
                           for base in variants] + [f':woman_{base_search}:']
 
-        return sorted(
-            list(
-                set(variants + man_variants + woman_variants).intersection(
-                    self.emoji_df['label'].tolist())))
+        return self.filter_list(variants) + self.filter_list(
+            woman_variants) + self.filter_list(man_variants)
 
     def top_emojis(self, search):
         search = self.w.lemmatize(search.strip().lower())

@@ -4,7 +4,7 @@ from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import dash_dataframe_table
 
-from EmojiFinder import EmojiFinderCached
+from EmojiFinder import EmojiFinderCached, SKIN_TONE_SUFFIXES
 from pathlib import Path
 
 parent_dir = Path().absolute().stem
@@ -13,7 +13,7 @@ e = EmojiFinderCached()
 
 app = Dash("emoji_finder",
            url_base_pathname=f"/dash/{parent_dir}/",
-           external_stylesheets=[dbc.themes.BOOTSTRAP],
+           external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP],
            title="Emoji Semantic Search",
            meta_tags=[
                {
@@ -24,26 +24,30 @@ app = Dash("emoji_finder",
 server = app.server
 STYLE = {"marginBottom": 30, "marginTop": 20, 'width': '75%'}
 
-layout = dbc.Container(
-    children=[
-        html.Datalist(id='auto-list',
-                      children=[
-                          html.Option(value=word)
-                          for word in sorted(list(e.vocab_dict.keys()))
-                      ]),
-        html.H3('Emoji Semantic Search', style={'text-align': 'center'}),
+layout = dbc.Container(children=[
+    html.H3('Emoji Semantic Search', style={'text-align': 'center'}),
+    dcc.Dropdown(id='skin-tone',
+                 options=SKIN_TONE_SUFFIXES,
+                 persistence=True,
+                 placeholder='Skin Tone search priority...'),
+    dcc.Dropdown(id='gender',
+                 options=['man', 'woman'],
+                 persistence=True,
+                 placeholder="Gender search priority..."),
+    dbc.InputGroup([
+        dbc.InputGroupText(
+            html.I(className="bi bi-search", style={'float': 'left'})),
         dbc.Input(
             id='search-input',
-            autoFocus=True,
             value='',
-            # debounce=True,
-            persistence=True,
-            type='text',
-            list='auto-list',
-            placeholder='Search for emoji...'),
-        html.Div(id='results')
+            debounce=True,
+            placeholder='Search for emoji (mostly limited to single words...)',
+        ),
     ],
-    style=STYLE)
+                   style=STYLE),
+    html.Div(id='results')
+],
+                       style=STYLE)
 
 app.layout = layout
 
@@ -60,16 +64,40 @@ def wrap_emoji(record):
     ])
 
 
-def make_cell(item):
+def make_cell(item, skin_tone, gender):
+    if not skin_tone:
+        skin_tone = ''
+    if not gender:
+        gender = ''
     additional_emojis = e.add_variants(item['label'])
     additional_emojis = [{
         'text': e.emoji_text_dict[x],
-        'emoji': e.emoji_dict[x]
+        'emoji': e.emoji_dict[x],
+        'key': x
     } for x in additional_emojis]
-    additional_emojis = sorted(additional_emojis, key=lambda x: x['text'])
+    priority_result = []
+    if skin_tone:
+        priority_result = [
+            x for x in additional_emojis if x['key'].endswith(skin_tone + ':')
+        ]
+    if gender:
+        priority_result = [
+            x for x in priority_result or additional_emojis
+            if x['key'].startswith(':' + gender)
+        ]
+    if priority_result:
+        priority_result = priority_result[0]
+        print('PRIORITY')
+        print(priority_result)
+        print("ALL ADDITIONAL")
+        print(additional_emojis)
+        additional_emojis.remove(priority_result)
+        target = priority_result
+    else:
+        target = item
     if additional_emojis:
         return [
-            html.Div(wrap_emoji(item)),
+            html.Div(wrap_emoji(target)),
             dbc.Button('More',
                        id={
                            'type': 'more-button',
@@ -86,18 +114,21 @@ def make_cell(item):
     return html.Div(wrap_emoji(item))
 
 
-def make_table_row(record):
-    return html.Tr(
-        [html.Td(record['text'].title()),
-         html.Td(make_cell(record))],
-        style={'margin': 'auto'})
+def make_table_row(record, skin_tone, gender):
+    return html.Tr([
+        html.Td(record['text'].title()),
+        html.Td(make_cell(record, skin_tone, gender))
+    ],
+                   style={'margin': 'auto'})
 
 
 @app.callback(
     Output('results', 'children'),
     Input('search-input', 'value'),
+    Input('skin-tone', 'value'),
+    Input('gender', 'value'),
 )
-def search_results(search):
+def search_results(search, skin_tone, gender):
     if search:
         full_res = e.top_emojis(search)
         if full_res.empty:
@@ -113,7 +144,8 @@ def search_results(search):
                                 html.Th("Emoji")]))
         ]
         table_rows = [
-            make_table_row(rec) for rec in full_res.to_dict('records')
+            make_table_row(rec, skin_tone, gender)
+            for rec in full_res.to_dict('records')
         ]
         table_body = [html.Tbody(table_rows)]
         return dbc.Table(table_header + table_body,
