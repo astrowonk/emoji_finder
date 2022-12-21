@@ -61,14 +61,15 @@ app.layout = layout
 
 def wrap_emoji(record):
     return html.Div([
-        html.P(record['emoji'], id=record['text'], style={'font-size': '3em'}),
+        html.P(record['emoji'], id=record['text'], style={'font-size': '4em'}),
         dcc.Clipboard(target_id=record['text'],
                       style={
                           'top': '-55px',
                           'right': '-65px',
                           'position': 'relative'
                       }),
-    ])
+    ],
+                    className='emoji')
 
 
 def make_cell(item, skin_tone, gender):
