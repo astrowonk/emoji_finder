@@ -14,6 +14,8 @@ The `EmojiFinder` class in `EmojiFinderPytorch.py` live encodes the search term,
 TODO:
 
 * Make a config file so one can run it with the full pytorch-requiring library (which can handle longer search terms)
-* Group different gender and skin tone variants of the same emoji on the same line. (i.e. include with the top result e.g. :supervillain:)
+* Make a Dash version for more layout flexibility / persistent preferences. (Maybe)
+  * Alternative : Figure out persistent preferences in Streamlit.
+* ~~Group different gender and skin tone variants of the same emoji on the same line. (i.e. include with the top result e.g. :supervillain:)~~
 * ~~Add the scripts that build the pre-computed distances.~~
 * ~~Compute distances with other methods (dot product) and models (pre-computed distances currently using only `all-mpnet-base-v2`)~~
