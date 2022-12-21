@@ -14,17 +14,6 @@ app = Dash(
     external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP],
 )
 
-ALLOWED_TYPES = (
-    "text",
-    "number",
-    "password",
-    "email",
-    "search",
-    "tel",
-    "url",
-    "range",
-    "hidden",
-)
 button_class = 'btn btn-outline-primary'
 
 
