@@ -24,16 +24,19 @@ app = Dash("emoji_finder",
 server = app.server
 STYLE = {"marginBottom": 30, "marginTop": 20, 'width': '75%'}
 
-layout = dbc.Container(children=[
-    html.H3('Emoji Semantic Search', style={'text-align': 'center'}),
-    dbc.Input(id='search-input',
-              autoFocus=True,
-              debounce=True,
-              persistence=True,
-              placeholder='Search for emoji...'),
-    html.Div(id='results')
-],
-                       style=STYLE)
+layout = dbc.Container(
+    children=[
+        html.H3('Emoji Semantic Search', style={'text-align': 'center'}),
+        dcc.Dropdown(
+            id='search-input',
+            #autoFocus=True,
+            #  debounce=True,
+            persistence=True,
+            placeholder='Search for emoji...',
+            options=sorted(list(e.vocab_dict.keys()))),
+        html.Div(id='results')
+    ],
+    style=STYLE)
 
 app.layout = layout
 
