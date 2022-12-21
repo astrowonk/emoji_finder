@@ -26,14 +26,21 @@ STYLE = {"marginBottom": 30, "marginTop": 20, 'width': '75%'}
 
 layout = dbc.Container(children=[
     html.H3('Emoji Semantic Search', style={'text-align': 'center'}),
-    dcc.Dropdown(id='skin-tone',
-                 options=SKIN_TONE_SUFFIXES,
-                 persistence=True,
-                 placeholder='Skin Tone search priority...'),
-    dcc.Dropdown(id='gender',
-                 options=['man', 'woman'],
-                 persistence=True,
-                 placeholder="Gender search priority..."),
+    dbc.Button('Search Priority Preferences',
+               id='expand-prefs',
+               class_name='btn-secondary btn-sm'),
+    dbc.Collapse([
+        dcc.Dropdown(id='skin-tone',
+                     options=SKIN_TONE_SUFFIXES,
+                     persistence=True,
+                     placeholder='Skin Tone search priority...'),
+        dcc.Dropdown(id='gender',
+                     options=['man', 'woman'],
+                     persistence=True,
+                     placeholder="Gender search priority..."),
+    ],
+                 id='search-priorities',
+                 is_open=False),
     dbc.InputGroup([
         dbc.InputGroupText(
             html.I(className="bi bi-search", style={'float': 'left'})),
@@ -70,7 +77,6 @@ def make_cell(item, skin_tone, gender):
     if not gender:
         gender = ''
     additional_emojis = e.add_variants(item['label'])
-    print(additional_emojis)
     additional_emojis = [{
         'text': e.emoji_text_dict[x],
         'emoji': e.emoji_dict[x],
@@ -173,6 +179,17 @@ def search_results(search, skin_tone, gender):
         'type': 'more-button',
         'index': MATCH
     }, 'n_clicks'),
+)
+def button_action(state, n_clicks):
+    if not n_clicks:
+        raise PreventUpdate
+    return not state
+
+
+@app.callback(
+    Output('search-priorities', 'is_open'),
+    State('search-priorities', 'is_open'),
+    Input('expand-prefs', 'n_clicks'),
 )
 def button_action(state, n_clicks):
     if not n_clicks:
