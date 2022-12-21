@@ -11,7 +11,7 @@ parent_dir = Path().absolute().stem
 
 e = EmojiFinderCached()
 
-app = Dash("emoji_finder",
+app = Dash(__name__,
            url_base_pathname=f"/dash/{parent_dir}/",
            external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP],
            title="Emoji Semantic Search",
