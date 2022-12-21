@@ -70,27 +70,32 @@ def make_cell(item, skin_tone, gender):
     if not gender:
         gender = ''
     additional_emojis = e.add_variants(item['label'])
+    print(additional_emojis)
     additional_emojis = [{
         'text': e.emoji_text_dict[x],
         'emoji': e.emoji_dict[x],
         'key': x
     } for x in additional_emojis]
     priority_result = []
+    gender_result = []
     if skin_tone:
         priority_result = [
             x for x in additional_emojis if x['key'].endswith(skin_tone + ':')
         ]
     if gender:
-        priority_result = [
+        gender_result = [
             x for x in priority_result or additional_emojis
             if x['key'].startswith(':' + gender)
         ]
+    if gender_result:
+        priority_result = gender_result
+
     if priority_result:
         priority_result = priority_result[0]
-        print('PRIORITY')
-        print(priority_result)
-        print("ALL ADDITIONAL")
-        print(additional_emojis)
+        #   print('PRIORITY')
+        #   print(priority_result)
+        #   print("ALL ADDITIONAL")
+        #   print(additional_emojis)
         additional_emojis.remove(priority_result)
         target = priority_result
     else:
