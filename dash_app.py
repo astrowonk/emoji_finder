@@ -26,14 +26,21 @@ STYLE = {"marginBottom": 30, "marginTop": 20, 'width': '75%'}
 
 layout = dbc.Container(
     children=[
+        html.Datalist(id='auto-list',
+                      children=[
+                          html.Option(value=word)
+                          for word in sorted(list(e.vocab_dict.keys()))
+                      ]),
         html.H3('Emoji Semantic Search', style={'text-align': 'center'}),
-        dcc.Dropdown(
+        dbc.Input(
             id='search-input',
-            #autoFocus=True,
-            #  debounce=True,
+            autoFocus=True,
+            value='',
+            # debounce=True,
             persistence=True,
-            placeholder='Search for emoji...',
-            options=sorted(list(e.vocab_dict.keys()))),
+            type='text',
+            list='auto-list',
+            placeholder='Search for emoji...'),
         html.Div(id='results')
     ],
     style=STYLE)
