@@ -22,7 +22,7 @@ app = Dash(__name__,
                },
            ])
 server = app.server
-STYLE = {"marginBottom": 30, "marginTop": 20, 'width': '75%'}
+STYLE = {"marginBottom": 20, "marginTop": 20, 'width': '75%'}
 
 range_slider = html.Div(
     [
@@ -66,6 +66,9 @@ layout = dbc.Container(children=[
         ),
     ],
                    style=STYLE),
+    dcc.Markdown(
+        "Source code and more info on [Github](https://github.com/astrowonk/emoji_finder)."
+    ),
     html.Div(id='results')
 ],
                        style=STYLE)
