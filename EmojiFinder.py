@@ -1,5 +1,6 @@
 import pandas as pd
 import nltk
+from sqlalchemy import create_engine
 
 try:
     nltk.data.find('corpora/wordnet')
@@ -46,5 +47,33 @@ class EmojiFinderCached():
         if (idx := self.vocab_dict.get(search)):
             return self.emoji_df.iloc[(
                 self.distances[idx])].query('version <= 14.0')
+        else:
+            return pd.DataFrame(columns=['text', 'emoji'])
+
+
+class EmojiFinderSql(EmojiFinderCached):
+
+    def __init__(self, model_name='all-mpnet-base-v2'):
+        self.con = create_engine('sqlite:///main.db')  #change later
+        self.w = nltk.WordNetLemmatizer()
+        self.all_labels = pd.read_sql('select distinct label from emoji;',
+                                      con=self.con)['label'].tolist()
+        self.emoji_dict = pd.read_sql(
+            "select * from emoji;",
+            con=self.con).set_index('label')[['emoji', 'text']].to_dict(
+                'index')  # would love to avoid this?
+
+    def filter_list(self, list1):
+        return sorted(list(set(list1).intersection(self.all_labels)))
+
+    def top_emojis(self, search):
+        search = self.w.lemmatize(search.strip().lower())
+        results = pd.read_sql(
+            "select  emoji,rank_of_search,label,text,version from combined where word = (?);",
+            con=self.con,
+            params=(search, ))
+        if not results.empty:
+            return results.query(
+                'version <= 14.0')  ## move this into sql and add index?
         else:
             return pd.DataFrame(columns=['text', 'emoji'])

@@ -3,6 +3,7 @@
 from sentence_transformers import SentenceTransformer, util
 import pandas as pd
 import numpy as np
+from sqlalchemy import create_engine
 
 
 class ComputeDistances:
@@ -14,8 +15,9 @@ class ComputeDistances:
             'emoji_df_improved.parquet'
         )  # dataframe of emojis and their descriptions
         self.model = SentenceTransformer(model_name)
-        self.all_words = pd.read_csv('cleaned_wordlist_all.txt',
-                                     header=None)[0].tolist()
+        self.all_words = pd.read_csv(
+            'cleaned_wordlist_all.txt', header=None)[0].tolist(
+            )  ## this list has been lemmatized and de-duplicated already.
 
     def make_emoji_vectors(self):
         self.vector_array_emoji = self.model.encode(
@@ -68,6 +70,18 @@ class ComputeDistances:
         self.distance_df.to_parquet(
             f'semantic_distances_{self.model_name}.parquet')
         self.distance_df.to_parquet(f'vocab_df_{self.model_name}.parquet')
+
+    def make_database(self):
+        """Need to test this!"""
+        con = create_engine(f"sqlite:///main_{self.model_name}.db")
+        self.distance_df.index = self.vocab_df['word']
+        new_df = self.distance_df.T
+        new_df.index.name = 'rank_of_search'
+        melted_df = pd.melt(new_df.reset_index(),
+                            value_name='word_lookup',
+                            id_vars=['rank_of_search'])
+        melted_df.to_sql('lookup', con=con, index=False, if_exists='replace')
+        self.emoji_data.reset_index().to_sql('emoji_df', con=con, index=False)
 
 
 if __name__ == '__main__':

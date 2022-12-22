@@ -4,12 +4,12 @@ from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import dash_dataframe_table
 
-from EmojiFinder import EmojiFinderCached, SKIN_TONE_SUFFIXES
+from EmojiFinder import EmojiFinderSql, SKIN_TONE_SUFFIXES
 from pathlib import Path
 
 parent_dir = Path().absolute().stem
 
-e = EmojiFinderCached()
+e = EmojiFinderSql()
 
 app = Dash(__name__,
            url_base_pathname=f"/dash/{parent_dir}/",
@@ -80,8 +80,8 @@ def make_cell(item, skin_tone, gender):
         gender = ''
     additional_emojis = e.add_variants(item['label'])
     additional_emojis = [{
-        'text': e.emoji_text_dict[x],
-        'emoji': e.emoji_dict[x],
+        'emoji': e.emoji_dict[x]['emoji'],
+        'text': e.emoji_dict[x]['text'],
         'key': x
     } for x in additional_emojis]
     priority_result = []
