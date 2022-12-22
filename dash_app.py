@@ -145,7 +145,7 @@ def search_results(search, skin_tone, gender):
     if search:
         full_res = e.top_emojis(search)
         if full_res.empty:
-            raise PreventUpdate
+            return html.H3('No Results')
         res_list = full_res.to_dict('records')
         variants = []
         for rec in res_list:
