@@ -26,7 +26,7 @@ STYLE = {"marginBottom": 30, "marginTop": 20, 'width': '75%'}
 
 layout = dbc.Container(children=[
     html.H3('Emoji Semantic Search', style={'text-align': 'center'}),
-    dbc.Button('Search Priority Preferences',
+    dbc.Button('Search Priority Settings',
                id='expand-prefs',
                class_name='btn-secondary btn-sm'),
     dbc.Collapse([
