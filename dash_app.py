@@ -61,7 +61,8 @@ app.layout = layout
 
 def wrap_emoji(record):
     return html.Div([
-        html.P(record['emoji'], id=record['text'], style={'font-size': '4em'}),
+        html.P(
+            record['emoji'], id=record['text'], style={'font-size': '3.5em'}),
         dcc.Clipboard(target_id=record['text'],
                       style={
                           'top': '-55px',
