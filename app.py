@@ -6,6 +6,10 @@ st.set_page_config(page_title="Emoji Finder", )
 
 st.title('Semantic Emoji Search')
 
+st.markdown(
+    "Also try [the Dash Version](https://marcoshuerta.com/dash/emoji_finder/) for more options and persistent settings. Source code and more info on [Github](https://github.com/astrowonk/emoji_finder)."
+)
+
 e = EmojiFinderSql()
 
 search = st.text_input("Search")
