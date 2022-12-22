@@ -1,19 +1,12 @@
 import streamlit as st
 import streamlit.components.v1 as components
-from EmojiFinder import EmojiFinderCached
+from EmojiFinder import EmojiFinderSql
 
 st.set_page_config(page_title="Emoji Finder", )
 
 st.title('Semantic Emoji Search')
 
-
-@st.experimental_memo(ttl=3600)
-def make_class():
-
-    return EmojiFinderCached()
-
-
-e = make_class()
+e = EmojiFinderSql()
 
 search = st.text_input("Search")
 col1, col2 = st.columns(2)
@@ -96,5 +89,5 @@ if search:
 
                     with st.expander("See More:"):
                         for x in additional_emojis:
-                            st.code(e.emoji_dict[x])
-                            st.text(e.emoji_text_dict[x])
+                            st.code(e.emoji_dict[x]['emoji'])
+                            st.text(e.emoji_dict[x]['text'])
