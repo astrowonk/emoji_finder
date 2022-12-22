@@ -16,6 +16,10 @@ The `EmojiFinder` class in `EmojiFinderPytorch.py` live encodes the search term,
 
 
 
+https://user-images.githubusercontent.com/13702392/209137437-4014ab8f-ceac-4528-a73d-38147d9f32b4.mp4
+
+
+
 TODO:
 
 * Make a config file so one can run it with the full pytorch-requiring library (which can handle longer search terms)
