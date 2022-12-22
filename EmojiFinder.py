@@ -19,6 +19,7 @@ class EmojiFinderCached():
         self.emoji_dict = self.emoji_df.set_index('label')['emoji'].to_dict()
         self.emoji_text_dict = self.emoji_df.set_index(
             'label')['text'].to_dict()
+        self.emoji__dict = self.emoji_df.set_index('label')['text'].to_dict()
         vocab_df = pd.read_parquet(f'vocab_df_{model_name}.parquet')
         self.vocab_dict = vocab_df.set_index('word')['idx'].to_dict()
         self.distances = pd.read_parquet(
@@ -43,6 +44,7 @@ class EmojiFinderCached():
     def top_emojis(self, search):
         search = self.w.lemmatize(search.strip().lower())
         if (idx := self.vocab_dict.get(search)):
-            return self.emoji_df.iloc[(self.distances[idx])]
+            return self.emoji_df.iloc[(
+                self.distances[idx])].query('version <= 14.0')
         else:
             return pd.DataFrame(columns=['text', 'emoji'])
