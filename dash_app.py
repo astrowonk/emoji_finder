@@ -24,12 +24,26 @@ app = Dash(__name__,
 server = app.server
 STYLE = {"marginBottom": 30, "marginTop": 20, 'width': '75%'}
 
+range_slider = html.Div(
+    [
+        dbc.Label("Font Size", html_for="font-size-slider"),
+        dcc.Slider(id="font-size-slider",
+                   min=1,
+                   max=4,
+                   step=.5,
+                   value=3,
+                   persistence=True),
+    ],
+    className="mb-3",
+)
+
 layout = dbc.Container(children=[
     html.H3('Emoji Semantic Search', style={'text-align': 'center'}),
-    dbc.Button('Search Priority Settings',
+    dbc.Button('Settings',
                id='expand-prefs',
                class_name='btn-secondary btn-sm'),
     dbc.Collapse([
+        range_slider,
         dcc.Dropdown(id='skin-tone',
                      options=SKIN_TONE_SUFFIXES,
                      persistence=True,
@@ -59,10 +73,11 @@ layout = dbc.Container(children=[
 app.layout = layout
 
 
-def wrap_emoji(record):
+def wrap_emoji(record, font_size):
     return html.Div([
-        html.P(
-            record['emoji'], id=record['text'], style={'font-size': '3.5em'}),
+        html.P(record['emoji'],
+               id=record['text'],
+               style={'font-size': f'{font_size}em'}),
         dcc.Clipboard(target_id=record['text'],
                       style={
                           'top': '-55px',
@@ -73,7 +88,7 @@ def wrap_emoji(record):
                     className='emoji')
 
 
-def make_cell(item, skin_tone, gender):
+def make_cell(item, skin_tone, gender, font_size):
     if not skin_tone:
         skin_tone = ''
     if not gender:
@@ -110,27 +125,28 @@ def make_cell(item, skin_tone, gender):
         target = item
     if additional_emojis:
         return [
-            html.Div(wrap_emoji(target)),
+            html.Div(wrap_emoji(target, font_size)),
             dbc.Button('More',
                        id={
                            'type': 'more-button',
                            'index': item['text']
                        },
                        className="btn-secondary btn-sm"),
-            dbc.Collapse([wrap_emoji(item) for item in additional_emojis],
-                         id={
-                             'type': 'more-emojis',
-                             'index': item['text']
-                         },
-                         is_open=False)
+            dbc.Collapse(
+                [wrap_emoji(item, font_size) for item in additional_emojis],
+                id={
+                    'type': 'more-emojis',
+                    'index': item['text']
+                },
+                is_open=False)
         ]
-    return html.Div(wrap_emoji(item))
+    return html.Div(wrap_emoji(item, font_size=font_size))
 
 
-def make_table_row(record, skin_tone, gender):
+def make_table_row(record, skin_tone, gender, font_size):
     return html.Tr([
         html.Td(record['text'].title()),
-        html.Td(make_cell(record, skin_tone, gender))
+        html.Td(make_cell(record, skin_tone, gender, font_size))
     ],
                    style={'margin': 'auto'})
 
@@ -140,8 +156,9 @@ def make_table_row(record, skin_tone, gender):
     Input('search-input', 'value'),
     Input('skin-tone', 'value'),
     Input('gender', 'value'),
+    Input('font-size-slider', 'value'),
 )
-def search_results(search, skin_tone, gender):
+def search_results(search, skin_tone, gender, font_size):
     if search:
         full_res = e.top_emojis(search)
         if full_res.empty:
@@ -157,7 +174,7 @@ def search_results(search, skin_tone, gender):
                                 html.Th("Emoji")]))
         ]
         table_rows = [
-            make_table_row(rec, skin_tone, gender)
+            make_table_row(rec, skin_tone, gender, font_size)
             for rec in full_res.to_dict('records')
         ]
         table_body = [html.Tbody(table_rows)]
