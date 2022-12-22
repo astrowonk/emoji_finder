@@ -14,7 +14,8 @@ The `EmojiFinder` class in `EmojiFinderPytorch.py` live encodes the search term,
 TODO:
 
 * Make a config file so one can run it with the full pytorch-requiring library (which can handle longer search terms)
-* Add persistent preferences for surfacing prioritizing which genders and skin tones to put at top of search.
+* Add other preferences like filtering max emoji version. (Currently hardcoded to 14 or lower.)
+~~* Add persistent preferences for surfacing prioritizing which genders and skin tones to put at top of search.~~
 * ~~Make a Dash version for more layout flexibility / persistent preferences. (Maybe)~~
   * ~~Alternative : Figure out persistent preferences in Streamlit~~. 
 * ~~Group different gender and skin tone variants of the same emoji on the same line. (i.e. include with the top result e.g. :supervillain:)~~
