@@ -1,7 +1,7 @@
 
 ## Semantic Emoji Search
 
-**[Try the Live Web App](http://marcoshuerta.com/dash/emoji_finder/)**
+**[----->  Try the Live Web App <-----](http://marcoshuerta.com/dash/emoji_finder/)**
 
 Inspired (nerd sniped?) by [this post](https://data-folks.masto.host/@archie/109543055657581394) on Mastodon, I have created this effort to do semantic searching for emoji. So, you can search for `flower`, and also get `bouquet` 💐, and `cherry blossom` 🌸. (The iOS emoji keyboard does something similar, but this remains unavailable on MacOS.)
 
