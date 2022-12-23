@@ -1,6 +1,7 @@
 import pandas as pd
 import nltk
 from sqlalchemy import create_engine
+import emoji
 
 try:
     nltk.data.find('corpora/wordnet')
@@ -20,7 +21,6 @@ class EmojiFinderCached():
         self.emoji_dict = self.emoji_df.set_index('label')['emoji'].to_dict()
         self.emoji_text_dict = self.emoji_df.set_index(
             'label')['text'].to_dict()
-        self.emoji__dict = self.emoji_df.set_index('label')['text'].to_dict()
         vocab_df = pd.read_parquet(f'vocab_df_{model_name}.parquet')
         self.vocab_dict = vocab_df.set_index('word')['idx'].to_dict()
         self.distances = pd.read_parquet(
@@ -58,20 +58,40 @@ class EmojiFinderSql(EmojiFinderCached):
         self.w = nltk.WordNetLemmatizer()
         self.all_labels = pd.read_sql('select distinct label from emoji;',
                                       con=self.con)['label'].tolist()
+        self.base_emoji_map = self.make_variant_map()
+        self.make_variant_map()
         self.emoji_dict = pd.read_sql(
             "select * from emoji;",
             con=self.con).set_index('label')[['emoji', 'text']].to_dict(
                 'index')  # would love to avoid this?
 
+    def make_variant_map(self):
+        no_variants = pd.read_sql('select distinct word from lookup_emoji;',
+                                  con=self.con)['word'].tolist()
+        new_dict = {}
+        for non_variant in no_variants:
+            the_variants = self.add_variants(non_variant)
+            new_dict.update({var: non_variant for var in the_variants})
+        return new_dict
+
     def filter_list(self, list1):
         return sorted(list(set(list1).intersection(self.all_labels)))
 
     def top_emojis(self, search):
-        search = self.w.lemmatize(search.strip().lower())
-        results = pd.read_sql(
-            "select  emoji,rank_of_search,label,text,version from combined where word = (?);",
-            con=self.con,
-            params=(search, ))
+        if not emoji.is_emoji(search):
+            search = self.w.lemmatize(search.strip().lower())
+            results = pd.read_sql(
+                "select  emoji,rank_of_search,label,text,version from combined where word = (?);",
+                con=self.con,
+                params=(search, ))
+        else:
+            search = emoji.demojize(search)
+            if base_emoji := self.base_emoji_map.get(search):
+                search = base_emoji
+            results = pd.read_sql(
+                "select  emoji,rank_of_search,label,text,version from combined_emoji where word = (?);",
+                con=self.con,
+                params=(search, ))
         if not results.empty:
             return results.query(
                 'version <= 14.0')  ## move this into sql and add index?

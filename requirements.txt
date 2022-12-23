@@ -3,3 +3,4 @@ numpy
 nltk
 pyarrow
 sqlalchemy
+emoji
