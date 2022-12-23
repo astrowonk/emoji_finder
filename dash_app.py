@@ -62,6 +62,7 @@ layout = dbc.Container(children=[
             id='search-input',
             value='',
             debounce=True,
+            autofocus=True,
             placeholder='Search for emoji (mostly limited to single words; or try an emoji like 🎟️)',
         ),
     ],
