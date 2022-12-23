@@ -5,7 +5,7 @@
 
 Inspired (nerd sniped?) by [this post](https://data-folks.masto.host/@archie/109543055657581394) on Mastodon, I have created this effort to do semantic searching for emoji. So, you can search for `flower`, and also get `bouquet` 💐, and `cherry blossom` 🌸. (The iOS emoji keyboard does something similar, but this remains unavailable on MacOS.)
 
-I'm using the python `sentence_tranformers` [package available from SBERT](https://www.sbert.net/index.html). This has a variety of [pretrained models suitable](https://www.sbert.net/docs/pretrained_models.htm) for the task of finding a semantic match between a search term and a target.
+I'm using the python `sentence_tranformers` [package available from SBERT](https://www.sbert.net/index.html). This has a variety of [pretrained models suitable](https://www.sbert.net/docs/pretrained_models.htm) for the task of finding a semantic match between a search term and a target. I'm using the `all-mpnet-base-v2` model for the web apps.
 
 In order to get this to run in the low memory environment of [streamlit](https://share.streamlit.io), or on my [own web site under dash](http://marcoshuerta.com/dash/emoji_finder/), I made a version that uses *precomputed semantic distance* against a corpus of common english words. This has the benefit of running with low memory on the web without pytorch, but the search only works for one-word searches. I may try to add command two-word phrases, but I imagine that data set would get large fast.
 
