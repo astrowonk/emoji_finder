@@ -11,11 +11,9 @@ In order to get this to run in the low memory environment of [streamlit](https:/
 
 The `EmojiFinder` class in `EmojiFinderPytorch.py` live encodes the search term, but still has a pre-encoded vectors for the emojis. 
 
-The dash app also includes a 2D projection of the `sentence_transformer` vectors via [UMAP](https://umap-learn.readthedocs.io/en/latest/). This shows the emojis as they relate to each other semantically. 
+The dash app also includes a 2D projection of the `sentence_transformer` vectors via [UMAP](https://umap-learn.readthedocs.io/en/latest/). This shows the emojis as they relate to each other semantically. This is limited to 750 emoji, but more will appear as one zooms in on the plotly graph. Clicking on an emoji will display it with a button to copy to the clipboard.
 ### Dash App Screen recording
-
-
-
+(older, pre-graph)
 
 https://user-images.githubusercontent.com/13702392/209137437-4014ab8f-ceac-4528-a73d-38147d9f32b4.mp4
 
