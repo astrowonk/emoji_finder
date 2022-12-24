@@ -76,11 +76,23 @@ tab1_content = dbc.Container(children=[
 ],
                              style=STYLE)
 
-tab2_content = html.Div(
-    dcc.Graph(id='my-graph', style={
-        'width': '120vh',
-        'height': '80vh'
-    }))
+tab2_content = dbc.Row([
+    dbc.Col(
+        dcc.Graph(
+            id='my-graph',
+            style={
+                #     'width': '120vh',
+                'height': '80vh'
+            },
+        )),
+    dbc.Col(html.Div(id='emoji-result',
+                     style={
+                         'top': '50%',
+                         'transform': 'translateY(-50%)',
+                         'position': 'absolute',
+                     }),
+            width=1),
+])
 
 tabs = dbc.Tabs([
     dbc.Tab(tab1_content, label="Search", tab_id='search-tab'),
@@ -88,7 +100,7 @@ tabs = dbc.Tabs([
 ],
                 active_tab='search-tab')
 
-app.layout = dbc.Container(tabs)
+app.layout = dbc.Container(tabs, style=STYLE)
 
 
 def wrap_emoji(record, font_size):
@@ -259,7 +271,8 @@ def make_graph(data):
                           labels={
                               'A': '',
                               'B': ''
-                          })
+                          },
+                          template='plotly_white')
     if data is not None and data.get('xaxis.range[0]'):
         fig.update_xaxes(range=[x_min, x_max])
         fig.update_yaxes(range=[y_min, y_max])
@@ -268,6 +281,30 @@ def make_graph(data):
     ))
     #fig.update_traces(textfont_size=14)
     return fig
+
+
+@app.callback(
+    Output("emoji-result", "children"),
+    Input('my-graph', 'clickData'),
+    State('font-size-slider', 'value'),
+)
+def custom_copy(click_data, fs):
+    print(click_data)
+    if click_data and click_data.get('points', []):
+        first_point = click_data['points'][0]
+        try:
+            theemoji = first_point['customdata'][0]
+        except KeyError:
+            print('key error')
+            theemoji = None
+            raise PreventUpdate
+        print(f"returning {theemoji}")
+        return wrap_emoji(
+            {
+                'emoji': e.emoji_dict[theemoji]['emoji'],
+                'text': 'the-clicked-emoji'
+            }, fs)  # includes headers
+    raise PreventUpdate
 
 
 if __name__ == "__main__":
