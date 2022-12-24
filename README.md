@@ -11,6 +11,7 @@ In order to get this to run in the low memory environment of [streamlit](https:/
 
 The `EmojiFinder` class in `EmojiFinderPytorch.py` live encodes the search term, but still has a pre-encoded vectors for the emojis. 
 
+The dash app also includes a 2D projection of the `sentence_transformer` vectors via [UMAP](https://umap-learn.readthedocs.io/en/latest/). This shows the emojis as they relate to each other semantically. 
 ### Dash App Screen recording
 
 
