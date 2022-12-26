@@ -66,8 +66,8 @@ class EmojiFinderSql(EmojiFinderCached):
             "select * from emoji;",
             con=self.con).set_index('label')[['emoji', 'text']].to_dict(
                 'index')  # would love to avoid this?
+        _ = self.w.lemmatize('test')
         print('end init of class')
-
 
     def make_variant_map(self):
         no_variants = pd.read_sql('select distinct word from lookup_emoji;',
