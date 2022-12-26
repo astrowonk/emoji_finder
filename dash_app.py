@@ -94,9 +94,27 @@ tab2_content = dbc.Row([
             width=1),
 ])
 
+tab3_content = dcc.Markdown("""
+
+Inspired ([nerd sniped?](https://xkcd.com/356/)) by [this post](https://data-folks.masto.host/@archie/109543055657581394) on Mastodon, I have created this effort to do semantic searching for emoji. So, you can search for `flower`, and also get `bouquet` 💐, and `cherry blossom` 🌸. (The iOS emoji keyboard does something similar, but this remains unavailable on MacOS.)
+
+I'm using the python `sentence_tranformers` [package available from SBERT](https://www.sbert.net/index.html). This has a variety of [pretrained models suitable](https://www.sbert.net/docs/pretrained_models.htm) for the task of finding a semantic match between a search term and a target. I'm using the `all-mpnet-base-v2` model for the web apps.
+
+In order to get this to run in a low memory environment of a web host, I *precompute semantic distance* against a corpus of common english words from [GloVe](https://nlp.stanford.edu/projects/glove/). This has the benefit of running with low memory on the web without pytorch, but the search only works for one-word searches. I may try to add command two-word phrases, but I imagine that data set would get large fast.
+
+The `ComputeDistances` in `precompute.py` file writes to a sqlite database, which I think reduces memory usage. (It can also generate a series of .parquet files.)
+
+The dash app also includes a 2D projection of the `sentence_transformer` vectors via [UMAP](https://umap-learn.readthedocs.io/en/latest/). This shows the emojis as they relate to each other semantically. This is limited to 750 emoji, but more will appear as one zooms in on the plotly graph. Clicking on an emoji will display it with a button to copy to the clipboard.
+
+Source code, sqlitedb, etc. on [my emoji finder github repository](https://github.com/astrowonk/emoji_finder).
+
+""",
+                            style=STYLE)
+
 tabs = dbc.Tabs([
     dbc.Tab(tab1_content, label="Search", tab_id='search-tab'),
-    dbc.Tab(tab2_content, label="Graph", tab_id='graph-tab')
+    dbc.Tab(tab2_content, label="Graph", tab_id='graph-tab'),
+    dbc.Tab(tab3_content, label='About')
 ],
                 active_tab='search-tab')
 
