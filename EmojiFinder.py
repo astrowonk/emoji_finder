@@ -1,6 +1,6 @@
 import pandas as pd
 import nltk
-from sqlalchemy import create_engine
+import sqlite3
 import emoji
 
 try:
@@ -54,7 +54,8 @@ class EmojiFinderCached():
 class EmojiFinderSql(EmojiFinderCached):
 
     def __init__(self, model_name='all-mpnet-base-v2'):
-        self.con = create_engine('sqlite:///main.db')  #change later
+        self.con = sqlite3.connect(
+            'main.db')  #change later, name should have model type in it
         self.w = nltk.WordNetLemmatizer()
         self.all_labels = pd.read_sql('select distinct label from emoji;',
                                       con=self.con)['label'].tolist()
