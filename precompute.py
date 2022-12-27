@@ -73,7 +73,7 @@ class ComputeDistances:
 
     def make_database(self):
         """Need to test this!"""
-        con = create_engine(f"sqlite:///main_{self.model_name}.db")
+        con = create_engine(f"sqlite:///main.db")
         self.distance_df.index = self.vocab_df['word']
         new_df = self.distance_df.T
         new_df.index.name = 'rank_of_search'
