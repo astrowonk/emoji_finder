@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 class ComputeDistances:
     distance_df = None
 
-    def __init__(self, model_name) -> None:
+    def __init__(self, model_name='all-mpnet-base-v2') -> None:
         self.model_name = model_name
         self.emoji_data = pd.read_parquet(
             'emoji_df_improved.parquet'
@@ -28,7 +28,7 @@ class ComputeDistances:
             str(x) for x in self.vector_array_emoji_df.columns
         ]  ## parquet needs string columns
 
-    def make_vocab_vectors(self, n=15000):
+    def make_vocab_vectors(self, n=30000):
         vocab = self.all_words[:n]
         self.vector_array_search_terms = self.model.encode(vocab)
         self.vocab_df = pd.DataFrame(pd.Series(vocab)).reset_index()

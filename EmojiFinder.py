@@ -32,7 +32,10 @@ class EmojiFinderCached():
             list(set(list1).intersection(self.emoji_df['label'].tolist())))
 
     def add_variants(self, base_label):
+
         base_search = base_label[1:-1]
+        if base_search in SKIN_TONE_SUFFIXES:
+            return []
         variants = [f":{base_search}_{x}:" for x in SKIN_TONE_SUFFIXES]
         man_variants = [':man_' + base[1:]
                         for base in variants] + [f':man_{base_search}:']
