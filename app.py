@@ -10,7 +10,14 @@ st.markdown(
     "Also try [the Dash Version](https://marcoshuerta.com/dash/emoji_finder/) for more options and persistent settings. Source code and more info on [Github](https://github.com/astrowonk/emoji_finder)."
 )
 
-e = EmojiFinderSql()
+
+@st.experimental_memo(ttl=3600)
+def make_class():
+
+    return EmojiFinderSql()
+
+
+e = make_class()
 
 search = st.text_input("Search")
 col1, col2 = st.columns(2)

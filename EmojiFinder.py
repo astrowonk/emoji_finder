@@ -55,8 +55,8 @@ class EmojiFinderSql(EmojiFinderCached):
 
     def __init__(self, model_name='all-mpnet-base-v2'):
         print('Begin init of class')
-        self.con = sqlite3.connect(
-            'main.db')  #change later, name should have model type in it
+        #self.con = sqlite3.connect(
+        #    'main.db')  #change later, name should have model type in it
         self.w = nltk.WordNetLemmatizer()
         self.all_labels = pd.read_sql('select distinct label from emoji;',
                                       con=self.con)['label'].tolist()
@@ -68,6 +68,10 @@ class EmojiFinderSql(EmojiFinderCached):
                 'index')  # would love to avoid this?
         _ = self.w.lemmatize('test')
         print('end init of class')
+
+    @property
+    def con(self):
+        return sqlite3.connect('main.db')
 
     def make_variant_map(self):
         no_variants = pd.read_sql('select distinct word from lookup_emoji;',
