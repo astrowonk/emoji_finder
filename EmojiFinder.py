@@ -9,8 +9,11 @@ except LookupError:
     nltk.download('wordnet')
 
 SKIN_TONE_SUFFIXES = [
-    'dark_skin_tone', 'light_skin_tone', 'medium-dark_skin_tone',
-    'medium-light_skin_tone', 'medium_skin_tone'
+    'medium-light_skin_tone',
+    'light_skin_tone',
+    'medium_skin_tone',
+    'medium-dark_skin_tone',
+    'dark_skin_tone',
 ]
 
 
@@ -41,7 +44,6 @@ class EmojiFinderCached():
                         for base in variants] + [f':man_{base_search}:']
         woman_variants = [':woman_' + base[1:]
                           for base in variants] + [f':woman_{base_search}:']
-
         return self.filter_list(variants) + self.filter_list(
             woman_variants) + self.filter_list(man_variants)
 

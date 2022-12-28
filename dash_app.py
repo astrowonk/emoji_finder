@@ -182,7 +182,10 @@ def make_cell(item, skin_tone, gender, font_size):
                            'type': 'more-button',
                            'index': item['text']
                        },
-                       className="btn-secondary btn-sm",
+                       className="me-1",
+                       size='sm',
+                       outline=True,
+                       color='dark',
                        style={'margin-top': '1em'}),
             dbc.Collapse(
                 [wrap_emoji(item, font_size) for item in additional_emojis],
