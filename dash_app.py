@@ -3,7 +3,6 @@ from dash.exceptions import PreventUpdate
 import pandas as pd
 
 import dash_bootstrap_components as dbc
-import dash_dataframe_table
 
 from EmojiFinder import EmojiFinderSql, SKIN_TONE_SUFFIXES
 from pathlib import Path
@@ -68,7 +67,7 @@ tab1_content = dbc.Container(children=[
             'Search for emoji (mostly limited to single words; or try an emoji like 🎟️)',
         ),
     ],
-                   style=STYLE),
+                   style={'margin-top':'20px', 'margin-bottom':'20px'}),
     dcc.Markdown(
         "Source code and more info on [Github](https://github.com/astrowonk/emoji_finder)."
     ),
@@ -122,18 +121,16 @@ app.layout = dbc.Container(tabs, style=STYLE)
 
 
 def wrap_emoji(record, font_size):
-    return html.Div([
+    return html.Div(children=[
         html.P(record['emoji'],
                id=record['text'],
-               style={'font-size': f'{font_size}em'}),
+               style={'font-size': f'{font_size}em','margin-bottom':'0px'}),
         dcc.Clipboard(target_id=record['text'],
-                      style={
-                          'top': '-55px',
-                          'right': '-65px',
-                          'position': 'relative'
-                      }),
+                      ),
     ],
-                    className='emoji')
+
+                    className='emoji',
+                    style={"display":"flex", "gap":"20px", "align-items":"center"})
 
 
 def make_cell(item, skin_tone, gender, font_size):
@@ -193,7 +190,7 @@ def make_cell(item, skin_tone, gender, font_size):
 
 def make_table_row(record, skin_tone, gender, font_size):
     return html.Tr([
-        html.Td(record['text'].title()),
+        html.Td(record['text'].title(), style= {'vertical-align': 'middle'}),
         html.Td(make_cell(record, skin_tone, gender, font_size))
     ],
                    style={'margin': 'auto'})
