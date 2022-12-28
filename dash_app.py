@@ -122,18 +122,21 @@ app.layout = dbc.Container(tabs, style=STYLE)
 
 
 def wrap_emoji(record, font_size):
-    return html.Div([
-        html.P(record['emoji'],
-               id=record['text'],
-               style={'font-size': f'{font_size}em'}),
-        dcc.Clipboard(target_id=record['text'],
-                      style={
-                          'top': '-55px',
-                          'right': '-65px',
-                          'position': 'relative'
-                      }),
-    ],
-                    className='emoji')
+    return html.Div(
+        [
+            html.Div(record['emoji'],
+                     id=record['text'],
+                     style={'font-size': f'{font_size}em'},
+                     className='emoji'),
+            dcc.Clipboard(
+                target_id=record['text'],
+                style={
+                    'margin-left': '.75em',
+                    #     'position': 'relative',
+                    #       'margin': 'auto'
+                },
+                className='emoji'),
+        ], )
 
 
 def make_cell(item, skin_tone, gender, font_size):
@@ -173,13 +176,14 @@ def make_cell(item, skin_tone, gender, font_size):
         target = item
     if additional_emojis:
         return [
-            html.Div(wrap_emoji(target, font_size)),
+            wrap_emoji(target, font_size),
             dbc.Button('More',
                        id={
                            'type': 'more-button',
                            'index': item['text']
                        },
-                       className="btn-secondary btn-sm"),
+                       className="btn-secondary btn-sm",
+                       style={'margin-top': '1em'}),
             dbc.Collapse(
                 [wrap_emoji(item, font_size) for item in additional_emojis],
                 id={
@@ -188,13 +192,14 @@ def make_cell(item, skin_tone, gender, font_size):
                 },
                 is_open=False)
         ]
-    return html.Div(wrap_emoji(item, font_size=font_size))
+    return wrap_emoji(item, font_size=font_size)
 
 
 def make_table_row(record, skin_tone, gender, font_size):
     return html.Tr([
-        html.Td(record['text'].title()),
-        html.Td(make_cell(record, skin_tone, gender, font_size))
+        html.Td(record['text'].title(), style={'margin': 'auto'}),
+        html.Td(make_cell(record, skin_tone, gender, font_size),
+                style={'margin': 'auto'})
     ],
                    style={'margin': 'auto'})
 
