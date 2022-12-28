@@ -7,11 +7,11 @@ Inspired ([nerd sniped?](https://xkcd.com/356/)) by [this post](https://data-fol
 
 I'm using the python `sentence_tranformers` [package available from SBERT](https://www.sbert.net/index.html). This has a variety of [pretrained models suitable](https://www.sbert.net/docs/pretrained_models.htm) for the task of finding a semantic match between a search term and a target. I'm using the `all-mpnet-base-v2` model for the web apps.
 
-In order to get this to run in the low memory environment of [streamlit](https://share.streamlit.io), or on my [own web site under dash](http://marcoshuerta.com/dash/emoji_finder/), I made a version that uses *precomputed semantic distance* against a corpus of common english words. This has the benefit of running with low memory on the web without pytorch, but the search only works for one-word searches. I may try to add command two-word phrases, but I imagine that data set would get large fast.
+In order to get this to run in the low memory environment of [streamlit](https://share.streamlit.io), or on my [own web site under dash](http://marcoshuerta.com/dash/emoji_finder/), I made a version that uses *precomputed semantic distance* against a corpus of common english words (now ~35,000 words). This has the benefit of running with low memory on the web without pytorch, but the search only works for one-word searches. I may try to add command two-word phrases, but I imagine that data set would get large fast.
 
 The `EmojiFinder` class in `EmojiFinderPytorch.py` live encodes the search term, but still has a pre-encoded vectors for the emojis. 
 
-The dash app also includes a 2D projection of the `sentence_transformer` vectors via [UMAP](https://umap-learn.readthedocs.io/en/latest/). This shows the emojis as they relate to each other semantically. This is limited to 750 emoji, but more will appear as one zooms in on the plotly graph. Clicking on an emoji will display it with a button to copy to the clipboard.
+The dash app also includes a 2D projection of the `sentence_transformer` vectors via [UMAP](https://umap-learn.readthedocs.io/en/latest/). This shows the emojis as they relate to each other semantically. This is limited to 750 emoji on the graph at once, but more will appear as one zooms in on the plotly graph. Clicking on an emoji will display it with a button to copy to the clipboard.
 ### Dash App Screen recording
 (older, pre-graph)
 
