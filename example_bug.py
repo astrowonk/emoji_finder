@@ -30,8 +30,11 @@ table_body = [html.Tbody([generate_row(k) for k in range(2)])]
 
 table = dbc.Table(table_header + table_body, bordered=True)
 
-app.layout = dbc.Container(
-    [table, dbc.Button("Not working", class_name=button_class)])
+app.layout = dbc.Container([
+    table,
+    dbc.Button("Not working", class_name=button_class),
+    dbc.Button("also not working Outline=True", outline=True, class_name=None)
+])
 
 if __name__ == "__main__":
     app.run_server(debug=True)
