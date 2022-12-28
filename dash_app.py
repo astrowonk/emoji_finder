@@ -39,9 +39,29 @@ range_slider = html.Div(
 
 tab1_content = dbc.Container(children=[
     html.H3('Emoji Semantic Search', style={'text-align': 'center'}),
-    dbc.Button('Settings',
-               id='expand-prefs',
-               class_name='btn-secondary btn-sm'),
+    dbc.Container(
+        [dbc.InputGroup([
+            dbc.InputGroupText(
+                html.I(className="bi bi-search", style={'float': 'left'})),
+            dbc.Input(
+                id='search-input',
+                value='',
+                debounce=True,
+                autofocus=True,
+                placeholder=
+                'Search for emoji (mostly limited to single words; or try an emoji like 🎟️)',
+            ),
+        ],
+                    style={'margin-top':'20px', 'margin-bottom':'20px'}),
+        dbc.Button('Settings',
+                id='expand-prefs',
+                class_name='btn-secondary btn-sm',
+                style={'margin-top':'20px', 'margin-bottom':'20px'}),
+        ],
+        style={'display':'flex', "gap":"20px",}
+    ),
+
+               
     dbc.Collapse([
         range_slider,
         dcc.Dropdown(id='skin-tone',
@@ -55,23 +75,10 @@ tab1_content = dbc.Container(children=[
     ],
                  id='search-priorities',
                  is_open=False),
-    dbc.InputGroup([
-        dbc.InputGroupText(
-            html.I(className="bi bi-search", style={'float': 'left'})),
-        dbc.Input(
-            id='search-input',
-            value='',
-            debounce=True,
-            autofocus=True,
-            placeholder=
-            'Search for emoji (mostly limited to single words; or try an emoji like 🎟️)',
-        ),
-    ],
-                   style={'margin-top':'20px', 'margin-bottom':'20px'}),
+    html.Div(id='results'),
     dcc.Markdown(
         "Source code and more info on [Github](https://github.com/astrowonk/emoji_finder)."
-    ),
-    html.Div(id='results')
+    )
 ],
                              style=STYLE)
 
@@ -171,17 +178,19 @@ def make_cell(item, skin_tone, gender, font_size):
         target = item
     if additional_emojis:
         return [
-            wrap_emoji(target, font_size),
-            dbc.Button('More',
+            html.Div(
+                children=[
+                    html.Div(wrap_emoji(target, font_size)),
+                    dbc.Button('More',
                        id={
                            'type': 'more-button',
                            'index': item['text']
                        },
-                       className="me-1",
-                       size='sm',
-                       outline=True,
-                       color='dark',
-                       style={'margin-top': '1em'}),
+                       className="btn-secondary btn-sm")
+                    ],
+                    style={'display':'flex', "gap":"20px", "align-items":"center", 'justify-content': 'space-between', 'margin-right':'20pxx`'}
+
+            ),
             dbc.Collapse(
                 [wrap_emoji(item, font_size) for item in additional_emojis],
                 id={
