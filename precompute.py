@@ -20,13 +20,26 @@ class ComputeDistances:
             )  ## this list has been lemmatized and de-duplicated already.
 
     def make_emoji_vectors(self):
-        self.vector_array_emoji = self.model.encode(
-            self.emoji_data['text']
-        )  #encode the emoji text data, e.g. 'cherry blossom' or green tree
+        emoji_dict = self.emoji_data.set_index('label')['text'].to_dict()
+        no_variants = [
+            x for x in self.emoji_data['label'].to_list()
+            if not 'skin_tone' in x
+        ]
+        #  no_variants = [x for x in no_variants if not (x.startswith(':woman'))]
+        # no_variants = [x for x in no_variants ]
+        # no_variants = no_variants + [':man:', ':woman:']
+        text_list = [emoji_dict[x] for x in no_variants]
+        self.vector_array_emoji = self.model.encode(text_list)
         self.vector_array_emoji_df = pd.DataFrame(self.vector_array_emoji)
         self.vector_array_emoji_df.columns = [
             str(x) for x in self.vector_array_emoji_df.columns
         ]  ## parquet needs string columns
+        map_index_orig = {key: i for i, key in enumerate(emoji_dict.keys())}
+        map_index_limited = {i: key for i, key in enumerate(no_variants)}
+        self.index_to_index = {
+            i: map_index_orig[map_index_limited[i]]
+            for i in range(len(no_variants))
+        }
 
     def make_vocab_vectors(self, n=30000):
         vocab = self.all_words[:n]
@@ -71,7 +84,7 @@ class ComputeDistances:
             f'semantic_distances_{self.model_name}.parquet')
         self.distance_df.to_parquet(f'vocab_df_{self.model_name}.parquet')
 
-    def make_database(self):
+    def make_database(self, db_name=None):
         """Need to test this!"""
         con = create_engine(f"sqlite:///main.db")
         self.distance_df.index = self.vocab_df['word']
@@ -80,8 +93,14 @@ class ComputeDistances:
         melted_df = pd.melt(new_df.reset_index(),
                             value_name='word_lookup',
                             id_vars=['rank_of_search'])
+        melted_df['word_lookup'] = melted_df['word_lookup'].map(
+            self.index_to_index)
+        melted_df['rank_of_search'] = melted_df['rank_of_search'].astype(int)
         melted_df.to_sql('lookup', con=con, index=False, if_exists='replace')
-        self.emoji_data.reset_index().to_sql('emoji_df', con=con, index=False)
+        self.emoji_data.reset_index().to_sql('emoji_df',
+                                             con=con,
+                                             index=False,
+                                             if_exists='raise')
 
 
 if __name__ == '__main__':

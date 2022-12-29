@@ -23,7 +23,7 @@ app = Dash(__name__,
                },
            ])
 server = app.server
-STYLE = {"marginBottom": 20, "marginTop": 20, 'width': '75%'}
+STYLE = {"marginBottom": 20, "marginTop": 20, 'width': '85%'}
 
 range_slider = html.Div(
     [
@@ -50,7 +50,7 @@ tab1_content = dbc.Container(children=[
                      persistence=True,
                      placeholder='Skin Tone search priority...'),
         dcc.Dropdown(id='gender',
-                     options=['man', 'woman'],
+                     options=['man', 'woman', 'person'],
                      persistence=True,
                      placeholder="Gender search priority..."),
     ],
@@ -136,6 +136,7 @@ def wrap_emoji(record, font_size):
                     #       'margin': 'auto'
                 },
                 className='emoji'),
+            dbc.Tooltip(record['label'], target=record['text'])
         ], )
 
 
@@ -148,18 +149,19 @@ def make_cell(item, skin_tone, gender, font_size):
     additional_emojis = [{
         'emoji': e.emoji_dict[x]['emoji'],
         'text': e.emoji_dict[x]['text'],
-        'key': x
+        'label': x
     } for x in additional_emojis]
     priority_result = []
     gender_result = []
     if skin_tone:
         priority_result = [
-            x for x in additional_emojis if x['key'].endswith(skin_tone + ':')
+            x for x in additional_emojis
+            if x['label'].endswith(skin_tone + ':')
         ]
     if gender:
         gender_result = [
             x for x in priority_result or additional_emojis
-            if x['key'].startswith(':' + gender)
+            if x['label'].startswith(':' + gender)
         ]
     if gender_result:
         priority_result = gender_result
@@ -224,7 +226,10 @@ def search_results(search, skin_tone, gender, font_size):
         for rec in res_list:
             variants.extend(e.add_variants(rec['label']))
         ## remove variants from list
-        full_res = full_res.query("label not in @variants")
+        #full_res = full_res.query("label not in @variants")
+        full_res['label'] = full_res['label'].apply(
+            lambda x: y if (y := e.base_emoji_map.get(x)) else x)
+        full_res = full_res.drop_duplicates(subset=['label'])
         table_header = [
             html.Thead(html.Tr([html.Th("Description"),
                                 html.Th("Emoji")]))
@@ -327,6 +332,7 @@ def custom_copy(click_data, fs):
         print(f"returning {theemoji}")
         return wrap_emoji(
             {
+                'label': theemoji,
                 'emoji': e.emoji_dict[theemoji]['emoji'],
                 'text': 'the-clicked-emoji'
             }, fs)  # includes headers

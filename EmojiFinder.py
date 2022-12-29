@@ -35,17 +35,26 @@ class EmojiFinderCached():
             list(set(list1).intersection(self.emoji_df['label'].tolist())))
 
     def add_variants(self, base_label):
-
+        #print(base_label)
         base_search = base_label[1:-1]
         if base_search in SKIN_TONE_SUFFIXES:
             return []
+        for prefix in ['person_', 'man_', 'woman_']:
+            if base_search.startswith(prefix):
+                base_search = base_search.replace(prefix, '')
+                # print(f'new base {base_search}')
+                break
         variants = [f":{base_search}_{x}:" for x in SKIN_TONE_SUFFIXES]
+        #print(variants)
         man_variants = [':man_' + base[1:]
                         for base in variants] + [f':man_{base_search}:']
         woman_variants = [':woman_' + base[1:]
                           for base in variants] + [f':woman_{base_search}:']
+        person_variants = [':person_' + base[1:]
+                           for base in variants] + [f':person_{base_search}:']
         return self.filter_list(variants) + self.filter_list(
-            woman_variants) + self.filter_list(man_variants)
+            woman_variants) + self.filter_list(
+                man_variants) + self.filter_list(person_variants)
 
     def top_emojis(self, search):
         search = self.w.lemmatize(search.strip().lower())
@@ -66,7 +75,6 @@ class EmojiFinderSql(EmojiFinderCached):
         self.all_labels = pd.read_sql('select distinct label from emoji;',
                                       con=self.con)['label'].tolist()
         self.base_emoji_map = self.make_variant_map()
-        self.make_variant_map()
         self.emoji_dict = pd.read_sql(
             "select * from emoji;",
             con=self.con).set_index('label')[['emoji', 'text']].to_dict(
