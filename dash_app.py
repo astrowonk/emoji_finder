@@ -38,6 +38,14 @@ range_slider = html.Div(
     className="mb-3",
 )
 
+
+def make_tone_options(x):
+    emoji = e.emoji_dict[f":clapping_hands_{x}:"]['emoji']
+    no_punctuation = x.replace('_', ' ').replace('-', ' ')
+    res = f"{emoji} {no_punctuation.title()}"
+    return res
+
+
 tab1_content = dbc.Container(children=[
     html.H3('Emoji Semantic Search', style={'text-align': 'center'}),
     dbc.Button('Settings',
@@ -46,7 +54,10 @@ tab1_content = dbc.Container(children=[
     dbc.Collapse([
         range_slider,
         dcc.Dropdown(id='skin-tone',
-                     options=SKIN_TONE_SUFFIXES,
+                     options=[{
+                         'label': make_tone_options(x),
+                         'value': x
+                     } for x in SKIN_TONE_SUFFIXES],
                      persistence=True,
                      placeholder='Skin Tone search priority...'),
         dcc.Dropdown(id='gender',
