@@ -3,7 +3,6 @@ from dash.exceptions import PreventUpdate
 import pandas as pd
 
 import dash_bootstrap_components as dbc
-import dash_dataframe_table
 
 from EmojiFinder import EmojiFinderSql, SKIN_TONE_SUFFIXES
 from pathlib import Path

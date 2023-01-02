@@ -16,7 +16,7 @@ class ComputeDistances:
         )  # dataframe of emojis and their descriptions
         self.model = SentenceTransformer(model_name)
         self.all_words = pd.read_csv(
-            'cleaned_wordlist_all.txt', header=None)[0].tolist(
+            'cleaned_wordlist_all.txt', header=None)[0].dropna().tolist(
             )  ## this list has been lemmatized and de-duplicated already.
 
     def make_emoji_vectors(self):
