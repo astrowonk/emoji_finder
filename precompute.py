@@ -16,8 +16,9 @@ class ComputeDistances:
         )  # dataframe of emojis and their descriptions
         self.model = SentenceTransformer(model_name)
         self.all_words = pd.read_csv(
-            'cleaned_wordlist_all.txt', header=None)[0].dropna().tolist(
-            )  ## this list has been lemmatized and de-duplicated already.
+            'cleaned_wordlist_allv2.txt', header=None
+        )[0].dropna().tolist(
+        )  ## this list has not been lemmatized, but de-duplicated already. Lemmatization at runtime is too memory intensive with nltk
 
     def make_emoji_vectors(self):
         emoji_dict = self.emoji_data.set_index('label')['text'].to_dict()
@@ -41,7 +42,7 @@ class ComputeDistances:
             for i in range(len(no_variants))
         }
 
-    def make_vocab_vectors(self, n=30000):
+    def make_vocab_vectors(self, n=40000):
         vocab = self.all_words[:n]
         self.vector_array_search_terms = self.model.encode(vocab)
         self.vocab_df = pd.DataFrame(pd.Series(vocab)).reset_index()

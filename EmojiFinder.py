@@ -1,12 +1,6 @@
 import pandas as pd
-import nltk
 import sqlite3
 import emoji
-
-try:
-    nltk.data.find('corpora/wordnet')
-except LookupError:
-    nltk.download('wordnet')
 
 SKIN_TONE_SUFFIXES = [
     'medium-light_skin_tone',
@@ -28,7 +22,6 @@ class EmojiFinderCached():
         self.vocab_dict = vocab_df.set_index('word')['idx'].to_dict()
         self.distances = pd.read_parquet(
             f'semantic_distances_{model_name}.parquet').values
-        self.w = nltk.WordNetLemmatizer()
 
     def filter_list(self, list1):
         return sorted(
@@ -57,7 +50,7 @@ class EmojiFinderCached():
                 man_variants) + self.filter_list(person_variants)
 
     def top_emojis(self, search):
-        search = self.w.lemmatize(search.strip().lower())
+        search = search.strip().lower()
         if (idx := self.vocab_dict.get(search)):
             return self.emoji_df.iloc[(
                 self.distances[idx])].query('version <= 14.0')
@@ -71,7 +64,6 @@ class EmojiFinderSql(EmojiFinderCached):
         print('Begin init of class')
         #self.con = sqlite3.connect(
         #    'main.db')  #change later, name should have model type in it
-        self.w = nltk.WordNetLemmatizer()
         self.all_labels = pd.read_sql('select distinct label from emoji;',
                                       con=self.con)['label'].tolist()
         self.base_emoji_map = self.make_variant_map()
@@ -79,7 +71,6 @@ class EmojiFinderSql(EmojiFinderCached):
             "select * from emoji;",
             con=self.con).set_index('label')[['emoji', 'text']].to_dict(
                 'index')  # would love to avoid this?
-        _ = self.w.lemmatize('test')
         print('end init of class')
 
     @property
@@ -100,7 +91,7 @@ class EmojiFinderSql(EmojiFinderCached):
 
     def top_emojis(self, search):
         if not emoji.is_emoji(search):
-            search = self.w.lemmatize(search.strip().lower())
+            search = search.strip().lower()
             results = pd.read_sql(
                 "select  emoji,rank_of_search,label,text,version from combined where word = (?) order by rank_of_search;",
                 con=self.con,
