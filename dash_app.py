@@ -47,9 +47,28 @@ def make_tone_options(x):
 
 tab1_content = dbc.Container(children=[
     html.H3('Emoji Semantic Search', style={'text-align': 'center'}),
-    dbc.Button('Settings',
-               id='expand-prefs',
-               class_name='btn-secondary btn-sm'),
+    dbc.Container(
+        [dbc.InputGroup([
+            dbc.InputGroupText(
+                html.I(className="bi bi-search", style={'float': 'left'})),
+            dbc.Input(
+                id='search-input',
+                value='',
+                debounce=True,
+                autofocus=True,
+                placeholder='Search for emoji (mostly limited to single words; or try an emoji like 🎟️)',
+            ),
+        ],
+            style={'margin-top': '20px', 'margin-bottom': '20px'}),
+            dbc.Button('Settings',
+                       id='expand-prefs',
+                       class_name='btn-secondary btn-sm',
+                       style={'margin-top': '20px', 'margin-bottom': '20px'}),
+        ],
+        style={'display': 'flex', "gap": "20px", }
+    ),
+
+
     dbc.Collapse([
         range_slider,
         dcc.Dropdown(id='skin-tone',
@@ -64,27 +83,14 @@ tab1_content = dbc.Container(children=[
                      persistence=True,
                      placeholder="Gender search priority..."),
     ],
-                 id='search-priorities',
-                 is_open=False),
-    dbc.InputGroup([
-        dbc.InputGroupText(
-            html.I(className="bi bi-search", style={'float': 'left'})),
-        dbc.Input(
-            id='search-input',
-            value='',
-            debounce=True,
-            autofocus=True,
-            placeholder=
-            'Search for emoji (mostly limited to single words; or try an emoji like 🎟️)',
-        ),
-    ],
-                   style=STYLE),
+        id='search-priorities',
+        is_open=False),
+    html.Div(id='results'),
     dcc.Markdown(
         "Source code and more info on [Github](https://github.com/astrowonk/emoji_finder)."
-    ),
-    html.Div(id='results')
+    )
 ],
-                             style=STYLE)
+    style=STYLE)
 
 tab2_content = dbc.Row([
     dbc.Col(
@@ -126,28 +132,22 @@ tabs = dbc.Tabs([
     dbc.Tab(tab2_content, label="Graph", tab_id='graph-tab'),
     dbc.Tab(tab3_content, label='About')
 ],
-                active_tab='search-tab')
+    active_tab='search-tab')
 
 app.layout = dbc.Container(tabs, style=STYLE)
 
 
 def wrap_emoji(record, font_size):
-    return html.Div(
-        [
-            html.Div(record['emoji'],
-                     id=record['text'],
-                     style={'font-size': f'{font_size}em'},
-                     className='emoji'),
-            dcc.Clipboard(
-                target_id=record['text'],
-                style={
-                    'margin-left': '.75em',
-                    #     'position': 'relative',
-                    #       'margin': 'auto'
-                },
-                className='emoji'),
-            dbc.Tooltip(record['label'], target=record['text'])
-        ], )
+    return html.Div(children=[
+        html.P(record['emoji'],
+               id=record['text'],
+               style={'font-size': f'{font_size}em', 'margin-bottom': '0px'}),
+        dcc.Clipboard(target_id=record['text'],
+                      ),
+    ],
+
+        className='emoji',
+        style={"display": "flex", "gap": "20px", "align-items": "center"})
 
 
 def make_cell(item, skin_tone, gender, font_size):
@@ -188,17 +188,20 @@ def make_cell(item, skin_tone, gender, font_size):
         target = item
     if additional_emojis:
         return [
-            wrap_emoji(target, font_size),
-            dbc.Button('More',
-                       id={
-                           'type': 'more-button',
-                           'index': item['text']
-                       },
-                       className="me-1",
-                       size='sm',
-                       outline=True,
-                       color='dark',
-                       style={'margin-top': '1em'}),
+            html.Div(
+                children=[
+                    html.Div(wrap_emoji(target, font_size)),
+                    dbc.Button('More',
+                               id={
+                                   'type': 'more-button',
+                                   'index': item['text']
+                               },
+                               className="btn-secondary btn-sm")
+                ],
+                style={'display': 'flex', "gap": "20px", "align-items": "center",
+                       'justify-content': 'space-between', 'margin-right': '20pxx`'}
+
+            ),
             dbc.Collapse(
                 [wrap_emoji(item, font_size) for item in additional_emojis],
                 id={
@@ -212,11 +215,10 @@ def make_cell(item, skin_tone, gender, font_size):
 
 def make_table_row(record, skin_tone, gender, font_size):
     return html.Tr([
-        html.Td(record['text'].title(), style={'margin': 'auto'}),
-        html.Td(make_cell(record, skin_tone, gender, font_size),
-                style={'margin': 'auto'})
+        html.Td(record['text'].title(), style={'vertical-align': 'middle'}),
+        html.Td(make_cell(record, skin_tone, gender, font_size))
     ],
-                   style={'margin': 'auto'})
+        style={'margin': 'auto'})
 
 
 @app.callback(
@@ -320,7 +322,7 @@ def make_graph(data):
     fig.update_layout(font=dict(
         size=24,  # Set the font size here
     ))
-    #fig.update_traces(textfont_size=14)
+    # fig.update_traces(textfont_size=14)
     return fig
 
 
