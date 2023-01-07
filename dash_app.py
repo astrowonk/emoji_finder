@@ -47,9 +47,36 @@ def make_tone_options(x):
 
 tab1_content = dbc.Container(children=[
     html.H3('Emoji Semantic Search', style={'text-align': 'center'}),
-    dbc.Button('Settings',
-               id='expand-prefs',
-               class_name='btn-secondary btn-sm'),
+    html.Div([
+        dbc.InputGroup([
+            dbc.InputGroupText(
+                html.I(className="bi bi-search", style={'float': 'left'})),
+            dbc.Input(
+                id='search-input',
+                value='',
+                debounce=True,
+                autofocus=True,
+                placeholder=
+                'Search for emoji (mostly limited to single words; or try an emoji like 🎟️)',
+            ),
+        ],
+                       style=STYLE),
+        dbc.Button(
+            'Settings',
+            id='expand-prefs',
+            class_name='me-1',
+            color='secondary',
+            size='sm',
+            style={
+                'margin-top': '20px',
+                'margin-bottom': '20px'
+            },
+        ),
+    ],
+             style={
+                 'display': 'flex',
+                 "gap": "20px",
+             }),
     dbc.Collapse([
         range_slider,
         dcc.Dropdown(id='skin-tone',
@@ -66,19 +93,6 @@ tab1_content = dbc.Container(children=[
     ],
                  id='search-priorities',
                  is_open=False),
-    dbc.InputGroup([
-        dbc.InputGroupText(
-            html.I(className="bi bi-search", style={'float': 'left'})),
-        dbc.Input(
-            id='search-input',
-            value='',
-            debounce=True,
-            autofocus=True,
-            placeholder=
-            'Search for emoji (mostly limited to single words; or try an emoji like 🎟️)',
-        ),
-    ],
-                   style=STYLE),
     dcc.Markdown(
         "Source code and more info on [Github](https://github.com/astrowonk/emoji_finder)."
     ),
@@ -142,8 +156,9 @@ def wrap_emoji(record, font_size):
                 target_id=record['text'],
                 style={
                     'margin-left': '.75em',
-                    #     'position': 'relative',
-                    #       'margin': 'auto'
+                    #   'padding-bottom': '1em',
+                    #  'position': 'relative',
+                    #                          'margin': 'auto'
                 },
                 className='emoji'),
             dbc.Tooltip(record['label'], target=record['text'])
@@ -188,17 +203,20 @@ def make_cell(item, skin_tone, gender, font_size):
         target = item
     if additional_emojis:
         return [
-            wrap_emoji(target, font_size),
-            dbc.Button('More',
-                       id={
-                           'type': 'more-button',
-                           'index': item['text']
-                       },
-                       className="me-1",
-                       size='sm',
-                       outline=True,
-                       color='dark',
-                       style={'margin-top': '1em'}),
+            html.Div([
+                wrap_emoji(target, font_size),
+                dbc.Button(
+                    'More',
+                    id={
+                        'type': 'more-button',
+                        'index': item['text']
+                    },
+                    className="me-1",
+                    size='sm',
+                    outline=True,
+                    color='dark',
+                ),
+            ], ),
             dbc.Collapse(
                 [wrap_emoji(item, font_size) for item in additional_emojis],
                 id={
@@ -292,7 +310,6 @@ def button_action(state, n_clicks):
     Input('my-graph', 'relayoutData'),
 )
 def make_graph(data):
-    print(data)
 
     x_min, x_max = -20.0, 20.0
     y_min, y_max = -20.0, 20.0
@@ -327,10 +344,11 @@ def make_graph(data):
 @app.callback(
     Output("emoji-result", "children"),
     Input('my-graph', 'clickData'),
-    State('font-size-slider', 'value'),
+    Input('font-size-slider', 'value'),
+    State('skin-tone', 'value'),
+    State('gender', 'value'),
 )
-def custom_copy(click_data, fs):
-    print(click_data)
+def custom_copy(click_data, fs, skin_tone, gender):
     if click_data and click_data.get('points', []):
         first_point = click_data['points'][0]
         try:
@@ -340,12 +358,12 @@ def custom_copy(click_data, fs):
             theemoji = None
             raise PreventUpdate
         print(f"returning {theemoji}")
-        return wrap_emoji(
+        return make_cell(
             {
                 'label': theemoji,
                 'emoji': e.emoji_dict[theemoji]['emoji'],
                 'text': 'the-clicked-emoji'
-            }, fs)  # includes headers
+            }, skin_tone, gender, fs)  # includes headers
     raise PreventUpdate
 
 
