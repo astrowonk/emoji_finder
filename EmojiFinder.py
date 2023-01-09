@@ -11,6 +11,10 @@ SKIN_TONE_SUFFIXES = [
 ]
 
 
+def flatten_list(list_of_lists):
+    return [y for x in list_of_lists for y in x]
+
+
 class EmojiFinderCached():
 
     def __init__(self, model_name='all-mpnet-base-v2'):
@@ -45,9 +49,15 @@ class EmojiFinderCached():
                           for base in variants] + [f':woman_{base_search}:']
         person_variants = [':person_' + base[1:]
                            for base in variants] + [f':person_{base_search}:']
+
+        extra_suffixes = flatten_list(
+            [[f":{gender}_{x}_{base_search}:" for x in SKIN_TONE_SUFFIXES]
+             for gender in ['man', 'woman', 'person']])
+
         return self.filter_list(variants) + self.filter_list(
             woman_variants) + self.filter_list(
-                man_variants) + self.filter_list(person_variants)
+                man_variants) + self.filter_list(
+                    person_variants) + self.filter_list(extra_suffixes)
 
     def top_emojis(self, search):
         search = search.strip().lower()
