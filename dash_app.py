@@ -180,8 +180,7 @@ def make_cell(item, skin_tone, gender, font_size):
     gender_result = []
     if skin_tone:
         priority_result = [
-            x for x in additional_emojis
-            if x['label'].endswith(skin_tone + ':')
+            x for x in additional_emojis if skin_tone in x['label']
         ]
     if gender:
         gender_result = [
