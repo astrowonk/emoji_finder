@@ -3,6 +3,8 @@
 
 **[----->  Try the Live Web App <-----](http://marcoshuerta.com/dash/emoji_finder/)**
 
+If you're a Mac user who uses (or wants to try) LaunchBar, try my [Semantic Emoji Finder Launch Bar Action](https://github.com/astrowonk/Emoji-Semantic-Search-LaunchBar-Action).
+
 Inspired ([nerd sniped?](https://xkcd.com/356/)) by [this post](https://data-folks.masto.host/@archie/109543055657581394) on Mastodon, I have created this effort to do semantic searching for emoji. So, you can search for `flower`, and also get `bouquet` 💐, and `cherry blossom` 🌸. (The iOS emoji keyboard does something similar, but this remains unavailable on MacOS.)
 
 I'm using the python `sentence_tranformers` [package available from SBERT](https://www.sbert.net/index.html). This has a variety of [pretrained models suitable](https://www.sbert.net/docs/pretrained_models.htm) for the task of finding a semantic match between a search term and a target. I'm using the `all-mpnet-base-v2` model for the web apps.
