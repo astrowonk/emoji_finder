@@ -192,10 +192,6 @@ def make_cell(item, skin_tone, gender, font_size):
 
     if priority_result:
         priority_result = priority_result[0]
-        #   print('PRIORITY')
-        #   print(priority_result)
-        #   print("ALL ADDITIONAL")
-        #   print(additional_emojis)
         additional_emojis.remove(priority_result)
         target = priority_result
     else:

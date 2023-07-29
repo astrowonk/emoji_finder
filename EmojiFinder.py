@@ -76,6 +76,8 @@ class EmojiFinderSql(EmojiFinderCached):
         #    'main.db')  #change later, name should have model type in it
         self.all_labels = pd.read_sql('select distinct label from emoji;',
                                       con=self.con)['label'].tolist()
+        self.all_words = pd.read_sql('select distinct word from combined;',
+                                     con=self.con)['word'].tolist()
         self.base_emoji_map = self.make_variant_map()
         self.emoji_dict = pd.read_sql(
             "select * from emoji;",
