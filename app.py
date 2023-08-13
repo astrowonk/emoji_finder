@@ -4,7 +4,6 @@ from EmojiFinder import EmojiFinderSql
 STYLE = {"marginBottom": 20, "marginTop": 20, 'width': '85%'}
 
 e = EmojiFinderSql()
-
 app_ui = ui.page_bootstrap([
     ui.head_content(
         ui.tags.script({
@@ -14,6 +13,11 @@ app_ui = ui.page_bootstrap([
         ui.tags.script({
             "src":
             "https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+        }),
+        ui.tags.link({
+            "href":
+            "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css",
+            "rel": "stylesheet"
         })),
     ui.tags.div(
         {
@@ -38,8 +42,21 @@ def process_additional_emojis(item):
 
 def wrap_emoji(emoji):
     return ui.tags.div([
-        ui.tags.p(emoji, {'style': 'font-size: 3em'}),
-        ui.tags.button("Copy", {"x-clipboard": 'input'})
+        ui.tags.div(
+            ui.tags.div(
+                emoji, {
+                    'style':
+                    'font-size: 3em; margin-left: .75em;  display: inline-block'
+                }),
+            ui.tags.button(
+                ui.tags.i({"class": "bi bi-clipboard"}, ),
+                {"x-clipboard": 'input'},
+                {
+                    "style":
+                    "margin-left: .75em; display: inline-block; margin:auto"
+                },
+                {"class": "btn btn-outline-secondary btn-sm"},
+            ))
     ], {'x-data': f"{{input: '{emoji}'}}"})
 
 
