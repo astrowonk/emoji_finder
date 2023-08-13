@@ -11,7 +11,7 @@ app_ui = ui.page_bootstrap([
             'class': 'container',
             'style': 'marginTop: 20, marginTop: 20, width: 85%'
         },
-        ui.panel_title("Emoji Search for Shiny!"),
+        ui.panel_title("Emoji Semantic Search with Shiny!"),
         ui.input_text("search", "Search", placeholder="Search emoji"),
         ui.output_ui("txt"),
     )
