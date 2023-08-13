@@ -25,6 +25,7 @@ app_ui = ui.page_bootstrap([
             'style': 'marginTop: 20, marginTop: 20, width: 85%'
         },
         ui.panel_title("Emoji Semantic Search with Shiny!"),
+        ui.markdown("""Shiny implementation of my Emoji semantic search. See the [Shiny branch](https://github.com/astrowonk/emoji_finder/tree/shiny) on Github for more."""),
         ui.input_text("search", "Search", placeholder="Search emoji"),
         ui.output_ui("txt"),
     )
