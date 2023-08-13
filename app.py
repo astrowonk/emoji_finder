@@ -1,12 +1,20 @@
 from shiny import App, render, ui, experimental
 from EmojiFinder import EmojiFinderSql
 
+STYLE = {"marginBottom": 20, "marginTop": 20, 'width': '85%'}
+
 e = EmojiFinderSql()
 
-app_ui = ui.page_fluid([
-    ui.panel_title("Emoji Search for Shiny!"),
-    ui.input_text("search", "Search", placeholder="Search emoji"),
-    ui.output_ui("txt"),
+app_ui = ui.page_bootstrap([
+    ui.tags.div(
+        {
+            'class': 'container',
+            'style': 'marginTop: 20, marginTop: 20, width: 85%'
+        },
+        ui.panel_title("Emoji Search for Shiny!"),
+        ui.input_text("search", "Search", placeholder="Search emoji"),
+        ui.output_ui("txt"),
+    )
 ])
 
 
@@ -49,7 +57,7 @@ def make_row(row, i):
 
 def make_my_table(rows):
     out = ui.tags.table(
-        {'class': 'table w-50 table-striped'},
+        {'class': 'table w-75 table-striped'},
         ui.tags.thead(ui.tags.tr([ui.tags.th("Label"),
                                   ui.tags.th("Emoji")])),
         ui.tags.tbody([make_row(x, i) for i, x in enumerate(rows)]),
