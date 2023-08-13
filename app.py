@@ -6,6 +6,15 @@ STYLE = {"marginBottom": 20, "marginTop": 20, 'width': '85%'}
 e = EmojiFinderSql()
 
 app_ui = ui.page_bootstrap([
+    ui.head_content(
+        ui.tags.script({
+            "src":
+            "https://cdn.jsdelivr.net/npm/@ryangjchandler/alpine-clipboard@2.x.x/dist/alpine-clipboard.js"
+        }),
+        ui.tags.script({
+            "src":
+            "https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+        })),
     ui.tags.div(
         {
             'class': 'container',
@@ -28,7 +37,10 @@ def process_additional_emojis(item):
 
 
 def wrap_emoji(emoji):
-    return ui.tags.p(emoji, {'style': 'font-size: 3em'})
+    return ui.tags.div([
+        ui.tags.p(emoji, {'style': 'font-size: 3em'}),
+        ui.tags.button("Copy", {"x-clipboard": 'input'})
+    ], {'x-data': f"{{input: '{emoji}'}}"})
 
 
 def process_one_emoji(row):
