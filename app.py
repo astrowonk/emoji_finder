@@ -19,14 +19,18 @@ def process_additional_emojis(item):
     } for x in additional_emojis]
 
 
+def wrap_emoji(emoji):
+    return ui.tags.p(emoji, {'style': 'font-size: 3em'})
+
+
 def process_one_emoji(row):
     more_emojis = process_additional_emojis(row)
     if not more_emojis:
-        return row['emoji']
+        return wrap_emoji(row['emoji'])
     else:
-        items = [ui.tags.p(x['emoji']) for x in more_emojis]
+        items = [wrap_emoji(x['emoji']) for x in more_emojis]
         return [
-            ui.tags.p(row['emoji']),
+            wrap_emoji(row['emoji']),
             experimental.ui.accordion(experimental.ui.accordion_panel(
                 "More",
                 *items,
