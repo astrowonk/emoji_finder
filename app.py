@@ -24,12 +24,16 @@ def process_one_emoji(row):
     if not more_emojis:
         return row['emoji']
     else:
-        items = [
-            experimental.ui.accordion_panel(x['emoji']) for x in more_emojis
+        items = [ui.tags.p(x['emoji']) for x in more_emojis]
+        return [
+            ui.tags.p(row['emoji']),
+            experimental.ui.accordion(experimental.ui.accordion_panel(
+                "More",
+                *items,
+                open=False,
+            ),
+                                      open=False)
         ]
-        return experimental.ui.accordion(*items,
-                                         open=False,
-                                         id='myaccordion')
 
 
 def make_row(row, i):
