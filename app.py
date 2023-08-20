@@ -1,5 +1,10 @@
 from shiny import App, render, ui, experimental
 from EmojiFinder import EmojiFinderSql
+import sys
+
+sys.path.append("../shiny_tables")
+
+from shiny_tables import enhanced_from_dataframe
 
 STYLE = {"marginBottom": 20, "marginTop": 20, 'width': '85%'}
 
@@ -29,7 +34,7 @@ app_ui = ui.page_bootstrap([
             """Shiny implementation of my Emoji semantic search. See the [Shiny branch](https://github.com/astrowonk/emoji_finder/tree/shiny) on Github for more."""
         ),
         ui.input_text("search", "Search", placeholder="Search emoji"),
-        ui.output_ui("txt"),
+        ui.output_ui("emoji_results"),
     )
 ])
 
@@ -43,14 +48,15 @@ def process_additional_emojis(item):
     } for x in additional_emojis]
 
 
-def wrap_emoji(emoji):
+def wrap_emoji(row):
     return ui.tags.div([
         ui.tags.div(
-           experimental.ui.tooltip( ui.tags.div(
-                emoji['emoji'], {
-                    'style':
-                    'font-size: 3em; margin-left: .75em;  display: inline-block'
-                }),emoji['text']),
+            experimental.ui.tooltip(
+                ui.tags.div(
+                    row['emoji'], {
+                        'style':
+                        'font-size: 3em; margin-left: .75em;  display: inline-block'
+                    }), row['text']),
             ui.tags.button(
                 ui.tags.i({"class": "bi bi-clipboard"}, ),
                 {"x-clipboard": 'input'},
@@ -60,10 +66,10 @@ def wrap_emoji(emoji):
                 },
                 {"class": "btn btn-outline-secondary btn-sm"},
             ))
-    ], {'x-data': f"{{input: '{emoji}'}}"})
+    ], {'x-data': f"""{{input: '{row["emoji"]}'}}"""})
 
 
-def process_one_emoji(row):
+def process_one_emoji(row, _):
     more_emojis = process_additional_emojis(row)
     if not more_emojis:
         return wrap_emoji(row)
@@ -80,33 +86,17 @@ def process_one_emoji(row):
         ]
 
 
-def make_row(row, i):
-    return ui.tags.tr([
-        ui.tags.td(row['text']),
-        ui.tags.td(process_one_emoji(row)),
-    ])
-
-
-def make_my_table(rows):
-    out = ui.tags.table(
-        {'class': 'table w-75 table-striped'},
-        ui.tags.thead(ui.tags.tr([ui.tags.th("Label"),
-                                  ui.tags.th("Emoji")])),
-        ui.tags.tbody([make_row(x, i) for i, x in enumerate(rows)]),
-    )
-    #print(out)
-    return out
-
-
 def server(input, output, session):
 
     @output
     @render.ui
-    def txt():
-        out = e.top_emojis(input.search()).to_dict(orient='records')
-        print(type(out))
-        if out:
-            return make_my_table(out)
+    def emoji_results():
+        out = e.top_emojis(input.search())
+        if not out.empty:
+            return enhanced_from_dataframe(
+                out,
+                column_callable_dict={'emoji': process_one_emoji},
+                columns=['text', 'emoji'])
         return None
 
 

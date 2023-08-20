@@ -4,3 +4,4 @@ __pycache__/
 words-common.txt
 new_model.txt
 __pycache__/*
+*.tmp
