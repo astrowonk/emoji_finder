@@ -46,11 +46,11 @@ def process_additional_emojis(item):
 def wrap_emoji(emoji):
     return ui.tags.div([
         ui.tags.div(
-            ui.tags.div(
-                emoji, {
+           experimental.ui.tooltip( ui.tags.div(
+                emoji['emoji'], {
                     'style':
                     'font-size: 3em; margin-left: .75em;  display: inline-block'
-                }),
+                }),emoji['text']),
             ui.tags.button(
                 ui.tags.i({"class": "bi bi-clipboard"}, ),
                 {"x-clipboard": 'input'},
@@ -66,11 +66,11 @@ def wrap_emoji(emoji):
 def process_one_emoji(row):
     more_emojis = process_additional_emojis(row)
     if not more_emojis:
-        return wrap_emoji(row['emoji'])
+        return wrap_emoji(row)
     else:
-        items = [wrap_emoji(x['emoji']) for x in more_emojis]
+        items = [wrap_emoji(row) for row in more_emojis]
         return [
-            wrap_emoji(row['emoji']),
+            wrap_emoji(row),
             experimental.ui.accordion(experimental.ui.accordion_panel(
                 "More",
                 *items,
