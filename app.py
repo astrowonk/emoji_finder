@@ -30,12 +30,11 @@ app_ui = ui.page_bootstrap([
             'style': 'marginTop: 20, marginTop: 20, width: 85%'
         },
         ui.panel_title("Emoji Semantic Search with Shiny!"),
-        ui.markdown(
-            """Shiny implementation of my Emoji semantic search. See the [Shiny branch](https://github.com/astrowonk/emoji_finder/tree/shiny) on Github for more.
-            
-            Bootstrap result tables powered by my [shiny_tables](https://github.com/astrowonk/shiny_tables) module, which turns dataframes into nice bootstrap tables.
+        ui.markdown("""
+Shiny implementation of my Emoji semantic search. See the [Shiny branch](https://github.com/astrowonk/emoji_finder/tree/shiny) on Github for more.
 
-            """),
+Bootstrap result tables powered by my [shiny_tables](https://github.com/astrowonk/shiny_tables) module, which turns dataframes into nice bootstrap tables.
+"""),
         ui.input_text(
             "search",
             "Search",
