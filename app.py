@@ -39,7 +39,7 @@ Bootstrap result tables powered by my [shiny_tables](https://github.com/astrowon
             "search",
             "Search",
             placeholder=
-            "Search for emoji (mostly limited to single words; or try an emoji like 🎟️)"
+            "Search for emoji (mostly limited to single words; or try an emoji like 🎟️)",width='75%',
         ),
         ui.output_ui("emoji_results"),
     )

@@ -11,7 +11,7 @@ st.markdown(
 )
 
 
-@st.experimental_memo(ttl=3600)
+@st.cache_data(ttl=3600)
 def make_class():
 
     return EmojiFinderSql()
