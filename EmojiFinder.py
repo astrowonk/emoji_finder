@@ -70,27 +70,29 @@ class EmojiFinderCached():
 
 class EmojiFinderSql(EmojiFinderCached):
 
-    def __init__(self, model_name='all-mpnet-base-v2'):
+    def __init__(self, model_name='all-mpnet-base-v2', db_name='main.db'):
+        self.db_name = db_name
         print('Begin init of class')
         #self.con = sqlite3.connect(
         #    'main.db')  #change later, name should have model type in it
-        self.all_labels = pd.read_sql('select distinct label from emoji;',
+        self.all_labels = pd.read_sql('select distinct label from emoji_df;',
                                       con=self.con)['label'].tolist()
-        self.all_words = pd.read_sql('select distinct word from combined;',
-                                     con=self.con)['word'].tolist()
+        self.all_words = pd.read_sql(
+            'select distinct word from combined_emoji;',
+            con=self.con)['word'].tolist()
         self.base_emoji_map = self.make_variant_map()
         self.emoji_dict = pd.read_sql(
-            "select * from emoji;",
+            "select * from emoji_df;",
             con=self.con).set_index('label')[['emoji', 'text']].to_dict(
                 'index')  # would love to avoid this?
         print('end init of class')
 
     @property
     def con(self):
-        return sqlite3.connect('main.db')
+        return sqlite3.connect(self.db_name)
 
     def make_variant_map(self):
-        no_variants = pd.read_sql('select distinct word from lookup_emoji;',
+        no_variants = pd.read_sql('select distinct word from lookup;',
                                   con=self.con)['word'].tolist()
         new_dict = {}
         for non_variant in no_variants:
@@ -102,10 +104,11 @@ class EmojiFinderSql(EmojiFinderCached):
         return sorted(list(set(list1).intersection(self.all_labels)))
 
     def top_emojis(self, search):
+        print('top emoji func=')
         if not emoji.is_emoji(search):
             search = search.strip().lower()
             results = pd.read_sql(
-                "select  emoji,rank_of_search,label,text,version from combined where word = (?) order by rank_of_search;",
+                "select  emoji,rank_of_search,label,text,version from combined_emoji where word = ? order by rank_of_search;",
                 con=self.con,
                 params=(search, ))
         else:
@@ -113,7 +116,7 @@ class EmojiFinderSql(EmojiFinderCached):
             if base_emoji := self.base_emoji_map.get(search):
                 search = base_emoji
             results = pd.read_sql(
-                "select  emoji,rank_of_search,label,text,version from combined_emoji where word = (?) order by rank_of_search;",
+                "select  emoji,rank_of_search,label,text,version from combined_emoji where word = ? order by rank_of_search;",
                 con=self.con,
                 params=(search, ))
         if not results.empty:

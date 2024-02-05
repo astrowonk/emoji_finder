@@ -9,7 +9,7 @@ from pathlib import Path
 
 parent_dir = Path().absolute().stem
 
-e = EmojiFinderSql()
+e = EmojiFinderSql(db_name='nomic_embed.db')
 
 app = Dash(__name__,
            url_base_pathname=f"/dash/{parent_dir}/",

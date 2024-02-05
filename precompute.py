@@ -1,6 +1,7 @@
 """Pre-generate needed model scores for emoji finding clasess."""
 
 from sentence_transformers import SentenceTransformer, util
+import torch
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
@@ -8,13 +9,18 @@ from sqlalchemy import create_engine
 
 class ComputeDistances:
     distance_df = None
+    emoji_prefix = 'search_document: '
+    vocab_prefix = 'search_query: '
+    vocab_suffix = ''
 
     def __init__(self, model_name='all-mpnet-base-v2') -> None:
         self.model_name = model_name
         self.emoji_data = pd.read_parquet(
             'emoji_df_improved.parquet'
         )  # dataframe of emojis and their descriptions
-        self.model = SentenceTransformer(model_name)
+        self.model = SentenceTransformer(model_name,
+                                         device=torch.device('mps'),
+                                         trust_remote_code=True)
         self.all_words = pd.read_csv(
             'cleaned_wordlist_allv2.txt', header=None
         )[0].dropna().tolist(
@@ -30,6 +36,7 @@ class ComputeDistances:
         # no_variants = [x for x in no_variants ]
         # no_variants = no_variants + [':man:', ':woman:']
         text_list = [emoji_dict[x] for x in no_variants]
+        text_list = [self.emoji_prefix + x for x in text_list]
         self.vector_array_emoji = self.model.encode(text_list)
         self.vector_array_emoji_df = pd.DataFrame(self.vector_array_emoji)
         self.vector_array_emoji_df.columns = [
@@ -44,7 +51,8 @@ class ComputeDistances:
 
     def make_vocab_vectors(self, n=40000):
         vocab = self.all_words[:n]
-        self.vector_array_search_terms = self.model.encode(vocab)
+        self.vector_array_search_terms = self.model.encode(
+            [self.vocab_prefix + x + self.vocab_suffix for x in vocab])
         self.vocab_df = pd.DataFrame(pd.Series(vocab)).reset_index()
         self.vocab_df.columns = ['idx', 'word']
 
@@ -87,7 +95,9 @@ class ComputeDistances:
 
     def make_database(self, db_name=None):
         """Need to test this!"""
-        con = create_engine(f"sqlite:///{self.model_name}main.db")
+        if not db_name:
+            db_name = f"{self.model_name}_main.db"
+        con = create_engine(f"sqlite:///{db_name}")
         self.distance_df.index = self.vocab_df['word']
         new_df = self.distance_df.T
         new_df.index.name = 'rank_of_search'
@@ -98,10 +108,9 @@ class ComputeDistances:
             self.index_to_index)
         melted_df['rank_of_search'] = melted_df['rank_of_search'].astype(int)
         melted_df.to_sql('lookup', con=con, index=False, if_exists='replace')
-        self.emoji_data.reset_index().to_sql('emoji_df',
-                                             con=con,
-                                             index=False,
-                                             if_exists='raise')
+        self.emoji_data.reset_index().rename(columns={
+            'index': 'idx'
+        }).to_sql('emoji_df', con=con, index=False, if_exists='replace')
 
 
 if __name__ == '__main__':
