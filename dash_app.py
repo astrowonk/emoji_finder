@@ -9,7 +9,7 @@ from pathlib import Path
 
 parent_dir = Path().absolute().stem
 
-e = EmojiFinderSql(db_name='nomic_embed.db')
+e = EmojiFinderSql(db_name='all-mpnet-base-v2_main.db')
 
 app = Dash(__name__,
            url_base_pathname=f"/dash/{parent_dir}/",
@@ -39,7 +39,7 @@ range_slider = html.Div(
 
 
 def make_tone_options(x):
-    emoji = e.emoji_dict[f":clapping_hands_{x}:"]['emoji']
+    emoji = e.new_emoji_dict(f":clapping_hands_{x}:")['emoji']
     no_punctuation = x.replace('_', ' ').replace('-', ' ')
     res = f"{emoji} {no_punctuation.title()}"
     return res
@@ -172,8 +172,8 @@ def make_cell(item, skin_tone, gender, font_size):
         gender = ''
     additional_emojis = e.add_variants(item['label'])
     additional_emojis = [{
-        'emoji': e.emoji_dict[x]['emoji'],
-        'text': e.emoji_dict[x]['text'],
+        'emoji': e.new_emoji_dict(x)['emoji'],
+        'text': e.new_emoji_dict(x)['text'],
         'label': x
     } for x in additional_emojis]
     priority_result = []
@@ -356,7 +356,7 @@ def custom_copy(click_data, fs, skin_tone, gender):
         return make_cell(
             {
                 'label': theemoji,
-                'emoji': e.emoji_dict[theemoji]['emoji'],
+                'emoji': e.new_emoji_dict(theemoji)['emoji'],
                 'text': 'the-clicked-emoji'
             }, skin_tone, gender, fs)  # includes headers
     raise PreventUpdate

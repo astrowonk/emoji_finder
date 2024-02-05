@@ -19,3 +19,5 @@ CREATE INDEX if not exists emoji_lookup on lookup(word);
 CREATE INDEX if not exists emoji_idx on emoji_df(idx);
 
 CREATE INDEX if not exists myindex on lookup(word);
+
+create index if not exists emoji_label on emoji_df(label);

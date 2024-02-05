@@ -6,3 +6,4 @@ new_model.txt
 __pycache__/*
 *.tmp
 nomic_embed.db
+*.db

@@ -75,21 +75,30 @@ class EmojiFinderSql(EmojiFinderCached):
         print('Begin init of class')
         #self.con = sqlite3.connect(
         #    'main.db')  #change later, name should have model type in it
-        self.all_labels = pd.read_sql('select distinct label from emoji_df;',
-                                      con=self.con)['label'].tolist()
-        self.all_words = pd.read_sql(
-            'select distinct word from combined_emoji;',
-            con=self.con)['word'].tolist()
+
         self.base_emoji_map = self.make_variant_map()
-        self.emoji_dict = pd.read_sql(
-            "select * from emoji_df;",
-            con=self.con).set_index('label')[['emoji', 'text']].to_dict(
-                'index')  # would love to avoid this?
+
         print('end init of class')
+
+    def sql_frame(self, query, params=None):
+        with sqlite3.connect(self.db_name) as con:
+            return pd.read_sql(query, con=con, params=params)
+
+    def new_emoji_dict(self, label):
+        df = self.sql_frame("select * from emoji_df where label =?",
+                            params=(label, ))
+        return df.set_index('idx').to_dict(orient='index')[0]
 
     @property
     def con(self):
         return sqlite3.connect(self.db_name)
+
+    def filter_list(self, list1):
+        query_list = [f"'{x}'" for x in set(list1)]
+        query_string = ",".join(query_list)
+        return sorted((self.sql_frame(
+            f"select label from emoji_df where label in ({query_string})")
+                       ['label'].to_list()))
 
     def make_variant_map(self):
         no_variants = pd.read_sql('select distinct word from lookup;',
@@ -100,9 +109,6 @@ class EmojiFinderSql(EmojiFinderCached):
             new_dict.update({var: non_variant for var in the_variants})
         return new_dict
 
-    def filter_list(self, list1):
-        return sorted(list(set(list1).intersection(self.all_labels)))
-
     def top_emojis(self, search):
         print('top emoji func=')
         if not emoji.is_emoji(search):
@@ -112,6 +118,7 @@ class EmojiFinderSql(EmojiFinderCached):
                 con=self.con,
                 params=(search, ))
         else:
+            ##TODO we need to put the variant mapping into the main emoji_df table
             search = emoji.demojize(search)
             if base_emoji := self.base_emoji_map.get(search):
                 search = base_emoji

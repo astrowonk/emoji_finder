@@ -9,12 +9,16 @@ from sqlalchemy import create_engine
 
 class ComputeDistances:
     distance_df = None
-    emoji_prefix = 'search_document: '
-    vocab_prefix = 'search_query: '
-    vocab_suffix = ''
 
-    def __init__(self, model_name='all-mpnet-base-v2') -> None:
+    def __init__(self,
+                 model_name='all-mpnet-base-v2',
+                 emoji_prefix='',
+                 vocab_prefix='',
+                 vocab_suffix='') -> None:
         self.model_name = model_name
+        self.emoji_prefix = emoji_prefix
+        self.vocab_prefix = vocab_prefix
+        self.vocab_suffix = vocab_suffix
         self.emoji_data = pd.read_parquet(
             'emoji_df_improved.parquet'
         )  # dataframe of emojis and their descriptions
@@ -123,4 +127,4 @@ if __name__ == '__main__':
 
     c = ComputeDistances(args.model_name)
     c.make_all()
-    c.save_all()
+    c.make_database()
