@@ -54,6 +54,7 @@ class EmojiFinderCached():
             [[f":{gender}_{x}_{base_search}:" for x in SKIN_TONE_SUFFIXES]
              for gender in ['man', 'woman', 'person']])
 
+        #        print(len(variants))
         return self.filter_list(variants) + self.filter_list(
             woman_variants) + self.filter_list(
                 man_variants) + self.filter_list(
@@ -76,9 +77,14 @@ class EmojiFinderSql(EmojiFinderCached):
         #self.con = sqlite3.connect(
         #    'main.db')  #change later, name should have model type in it
 
-        self.base_emoji_map = self.make_variant_map()
+        #self.base_emoji_map = self.make_variant_map()
 
         print('end init of class')
+
+    def prep_for_variant_map(self):
+        self.all_labels = pd.read_sql('select distinct label from emoji_df;',
+                                      con=self.con)['label'].tolist()
+        self.make_variant_map()
 
     def sql_frame(self, query, params=None):
         with sqlite3.connect(self.db_name) as con:
@@ -87,34 +93,37 @@ class EmojiFinderSql(EmojiFinderCached):
     def new_emoji_dict(self, label):
         df = self.sql_frame("select * from emoji_df where label =?",
                             params=(label, ))
-        return df.set_index('idx').to_dict(orient='index')[0]
+        # print(df.shape)
+        # return df
+        return list(df.set_index('idx').to_dict(orient='index').values())[0]
+
+    def sql_add_variants(self, label):
+        return self.sql_frame(
+            "select label from emoji_df where base_emoji = ? and base_emoji <> label",
+            params=(label, ))['label'].to_list()
 
     @property
     def con(self):
         return sqlite3.connect(self.db_name)
 
     def filter_list(self, list1):
-        query_list = [f"'{x}'" for x in set(list1)]
-        query_string = ",".join(query_list)
-        return sorted((self.sql_frame(
-            f"select label from emoji_df where label in ({query_string})")
-                       ['label'].to_list()))
+        return sorted(list(set(list1).intersection(self.all_labels)))
 
     def make_variant_map(self):
-        no_variants = pd.read_sql('select distinct word from lookup;',
-                                  con=self.con)['word'].tolist()
+        no_variants = pd.read_csv('no_variant_list.txt')['word'].tolist()
+        print(len(no_variants))
         new_dict = {}
         for non_variant in no_variants:
             the_variants = self.add_variants(non_variant)
             new_dict.update({var: non_variant for var in the_variants})
-        return new_dict
+        self.base_emoji_map = new_dict.copy()
 
     def top_emojis(self, search):
         print('top emoji func=')
         if not emoji.is_emoji(search):
             search = search.strip().lower()
             results = pd.read_sql(
-                "select  emoji,rank_of_search,label,text,version from combined_emoji where word = ? order by rank_of_search;",
+                "select * from combined_emoji where word = ? order by rank_of_search;",
                 con=self.con,
                 params=(search, ))
         else:
@@ -123,7 +132,7 @@ class EmojiFinderSql(EmojiFinderCached):
             if base_emoji := self.base_emoji_map.get(search):
                 search = base_emoji
             results = pd.read_sql(
-                "select  emoji,rank_of_search,label,text,version from combined_emoji where word = ? order by rank_of_search;",
+                "select * from combined_emoji where word = ? order by rank_of_search;",
                 con=self.con,
                 params=(search, ))
         if not results.empty:

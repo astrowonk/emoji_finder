@@ -6,6 +6,7 @@ select
 	emoji,
 	rank_of_search,
 	label,
+	base_emoji,
 	text,
 	version
 from
@@ -21,3 +22,7 @@ CREATE INDEX if not exists emoji_idx on emoji_df(idx);
 CREATE INDEX if not exists myindex on lookup(word);
 
 create index if not exists emoji_label on emoji_df(label);
+
+drop index if exists emoji_base;
+
+create index if not exists emoji_base on emoji_df(base_emoji);

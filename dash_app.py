@@ -170,7 +170,7 @@ def make_cell(item, skin_tone, gender, font_size):
         skin_tone = ''
     if not gender:
         gender = ''
-    additional_emojis = e.add_variants(item['label'])
+    additional_emojis = e.sql_add_variants(item['label'])
     additional_emojis = [{
         'emoji': e.new_emoji_dict(x)['emoji'],
         'text': e.new_emoji_dict(x)['text'],
@@ -245,13 +245,12 @@ def search_results(search, skin_tone, gender, font_size):
         if full_res.empty:
             return html.H3('No Results')
         res_list = full_res.to_dict('records')
-        variants = []
-        for rec in res_list:
-            variants.extend(e.add_variants(rec['label']))
+
         ## remove variants from list
         #full_res = full_res.query("label not in @variants")
-        full_res['label'] = full_res['label'].apply(
-            lambda x: y if (y := e.base_emoji_map.get(x)) else x)
+        #  full_res['label'] = full_res['label'].apply(
+        #      lambda x: y if (y := e.base_emoji_map.get(x)) else x)
+        # full_res['label'] = full_res['base_emoji']
         full_res = full_res.drop_duplicates(subset=['label'])
         table_header = [
             html.Thead(html.Tr([html.Th("Description"),
