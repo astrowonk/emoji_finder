@@ -71,7 +71,7 @@ class EmojiFinderCached():
 
 class EmojiFinderSql(EmojiFinderCached):
 
-    def __init__(self, model_name='all-mpnet-base-v2', db_name='main.db'):
+    def __init__(self, db_name='all-mpnet-base-v2_main.db'):
         self.db_name = db_name
         print('Begin init of class')
         #self.con = sqlite3.connect(
