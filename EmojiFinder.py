@@ -91,11 +91,12 @@ class EmojiFinderSql(EmojiFinderCached):
             return pd.read_sql(query, con=con, params=params)
 
     def new_emoji_dict(self, label):
-        df = self.sql_frame("select * from emoji_df where label =?",
-                            params=(label, ))
         # print(df.shape)
         # return df
-        return list(df.set_index('idx').to_dict(orient='index').values())[0]
+        return dict(
+            zip(['idx', 'emoji', 'label', 'version', 'text', 'base_emoji'],
+                self.con.execute("Select * from emoji_df where label = ?;",
+                                 (label, )).fetchone()))
 
     def sql_add_variants(self, label):
         return self.sql_frame(
