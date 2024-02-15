@@ -124,7 +124,7 @@ class EmojiFinderSql(EmojiFinderCached):
         if not emoji.is_emoji(search):
             search = search.strip().lower()
             results = pd.read_sql(
-                "select * from combined_emoji where word = ? order by rank_of_search;",
+                "select * from combined_emoji where word = ?  and label = base_emoji order by rank_of_search;",
                 con=self.con,
                 params=(search, ))
         else:
@@ -133,7 +133,7 @@ class EmojiFinderSql(EmojiFinderCached):
             if base_emoji := self.base_emoji_map.get(search):
                 search = base_emoji
             results = pd.read_sql(
-                "select * from combined_emoji where word = ? order by rank_of_search;",
+                "select * from combined_emoji where word = ? and label = base_emoji order by rank_of_search ;",
                 con=self.con,
                 params=(search, ))
         if not results.empty:
