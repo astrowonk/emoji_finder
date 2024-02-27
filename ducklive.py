@@ -2,7 +2,7 @@ import duckdb
 import llama_cpp
 
 
-class DuckTest:
+class LiveSearch:
 
     def __init__(self, model_path) -> None:
         self.model = llama_cpp.Llama(model_path=model_path,

@@ -5,13 +5,13 @@ import pandas as pd
 import dash_bootstrap_components as dbc
 
 from EmojiFinder import EmojiFinderSql, SKIN_TONE_SUFFIXES
-from ducklive import DuckTest
+from ducklive import LiveSearch
 from pathlib import Path
 
 parent_dir = Path().absolute().stem
 
 e = EmojiFinderSql(db_name='all-mpnet-base-v2_main.db')
-d = DuckTest(model_path='minilm-v6.gguf')
+d = LiveSearch(model_path='minilm-v6.gguf')
 
 app = Dash(__name__,
            url_base_pathname=f"/dash/{parent_dir}/",
