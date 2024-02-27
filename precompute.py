@@ -22,9 +22,12 @@ class ComputeDistances:
         self.emoji_data = pd.read_parquet(
             'emoji_df_improved.parquet'
         )  # dataframe of emojis and their descriptions
-        self.model = SentenceTransformer(model_name,
-                                         device=torch.device('mps'),
-                                         trust_remote_code=True)
+        try:
+            self.model = SentenceTransformer(model_name,
+                                             device=torch.device('mps'),
+                                             trust_remote_code=True)
+        except:
+            self.model = SentenceTransformer(model_name)
         self.all_words = pd.read_csv(
             'cleaned_wordlist_allv2.txt', header=None
         )[0].dropna().tolist(
