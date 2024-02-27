@@ -248,7 +248,6 @@ def search_results(search, skin_tone, gender, font_size):
             full_res = d.get_emoji(search)
         if full_res.empty:  # if it's still somehow empty
             return html.H3('No Results')
-        res_list = full_res.to_dict('records')
 
         ## remove variants from list
         #full_res = full_res.query("label not in @variants")
