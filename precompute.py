@@ -129,7 +129,7 @@ class DuckTest:
                                      embedding=True,
                                      verbose=False)
 
-        self.con = duckdb.connect('vectors.db')
+        self.con = duckdb.connect('vectors.db', read_only=True)
 
     def get_emoji(self, text):
         arr = self.model.create_embedding(text)['data'][0]['embedding']
