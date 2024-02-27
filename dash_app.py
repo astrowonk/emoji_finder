@@ -5,11 +5,13 @@ import pandas as pd
 import dash_bootstrap_components as dbc
 
 from EmojiFinder import EmojiFinderSql, SKIN_TONE_SUFFIXES
+from ducklive import DuckTest
 from pathlib import Path
 
 parent_dir = Path().absolute().stem
 
 e = EmojiFinderSql(db_name='all-mpnet-base-v2_main.db')
+d = DuckTest(model_path='minilm-v6.gguf')
 
 app = Dash(__name__,
            url_base_pathname=f"/dash/{parent_dir}/",
@@ -241,7 +243,7 @@ def make_table_row(record, skin_tone, gender, font_size):
 )
 def search_results(search, skin_tone, gender, font_size):
     if search:
-        full_res = e.top_emojis(search)
+        full_res = d.get_emoji(search)
         if full_res.empty:
             return html.H3('No Results')
         res_list = full_res.to_dict('records')
