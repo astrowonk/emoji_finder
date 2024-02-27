@@ -243,8 +243,10 @@ def make_table_row(record, skin_tone, gender, font_size):
 )
 def search_results(search, skin_tone, gender, font_size):
     if search:
-        full_res = d.get_emoji(search)
+        full_res = e.top_emojis(search)
         if full_res.empty:
+            full_res = d.get_emoji(search)
+        if full_res.empty:  # if it's still somehow empty
             return html.H3('No Results')
         res_list = full_res.to_dict('records')
 
