@@ -6,7 +6,6 @@ import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
 import duckdb
-import llama_cpp
 
 
 class ComputeDistances:
