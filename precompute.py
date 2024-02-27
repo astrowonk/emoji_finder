@@ -5,6 +5,7 @@ import torch
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
+import duckdb
 
 
 class ComputeDistances:
@@ -118,6 +119,19 @@ class ComputeDistances:
         self.emoji_data.reset_index().rename(columns={
             'index': 'idx'
         }).to_sql('emoji_df', con=con, index=False, if_exists='replace')
+
+
+class DuckTest:
+
+    def __init__(self, model_name='all-mpnet-base-v2') -> None:
+        self.model = SentenceTransformer(model_name)
+        self.con = duckdb.connect('vectors.db')
+
+    def get_emoji(self, text):
+        arr = self.model.encode(text).tolist()
+        return self.con.sql(
+            f"select id,array_cosine_similarity(arr,{arr}::DOUBLE[768]) as similarity,emoji from array_table a left join emoji_df e on a.id = e.idx order by similarity desc limit 20;"
+        ).to_df()
 
 
 if __name__ == '__main__':
