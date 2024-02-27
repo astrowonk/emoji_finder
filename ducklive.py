@@ -1,5 +1,6 @@
 import duckdb
 import llama_cpp
+from functools import lru_cache
 
 
 class LiveSearch:
@@ -11,6 +12,7 @@ class LiveSearch:
 
         self.con = duckdb.connect('vectors.db', read_only=True)
 
+    @lru_cache(maxsize=None)
     def get_emoji(self, text):
         arr = self.model.create_embedding(text)['data'][0]['embedding']
 
