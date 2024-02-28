@@ -11,9 +11,9 @@ class LiveSearch:
                                      verbose=False)
 
         self.con = duckdb.connect('vectors.db', read_only=True)
+        self.get_emoji = lru_cache(maxsize=None)(self._get_emoji)
 
-    @lru_cache(maxsize=None)
-    def get_emoji(self, text):
+    def _get_emoji(self, text):
         arr = self.model.create_embedding(text)['data'][0]['embedding']
 
         return self.con.sql(
