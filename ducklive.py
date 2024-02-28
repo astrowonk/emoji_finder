@@ -17,5 +17,5 @@ class LiveSearch:
         arr = self.model.create_embedding(text)['data'][0]['embedding']
 
         return self.con.sql(
-            f"select id,array_cosine_similarity(arr,{arr}::DOUBLE[384]) as similarity,e.* from array_table a left join emoji_df e on a.id = e.idx where label = base_emoji order by similarity desc limit 20;"
+            f"select id,array_cosine_similarity(arr,{arr}::DOUBLE[384]) as similarity,e.* from array_table a left join emoji_df e on a.id = e.idx where label = base_emoji order by similarity desc limit 25;"
         ).to_df()
