@@ -59,7 +59,7 @@ tab1_content = dbc.Container(children=[
                 debounce=True,
                 autofocus=True,
                 placeholder=
-                'Search for emoji (mostly limited to single words; or try an emoji like 🎟️)',
+                'Search for emoji or try an emoji like 🎟️.',
             ),
         ],
                        style=STYLE),
