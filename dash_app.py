@@ -126,7 +126,9 @@ Inspired ([nerd sniped?](https://xkcd.com/356/)) by [this post](https://data-fol
 
 I'm using the python `sentence_tranformers` [package available from SBERT](https://www.sbert.net/index.html). This has a variety of [pretrained models suitable](https://www.sbert.net/docs/pretrained_models.htm) for the task of finding a semantic match between a search term and a target. I'm using the `all-mpnet-base-v2` model for the web apps.
 
-In order to get this to run in a low memory environment of a web host, I *precompute semantic distance* against a corpus of common english words from [GloVe](https://nlp.stanford.edu/projects/glove/). This has the benefit of running with low memory on the web without pytorch, but the search only works for one-word searches. I may try to add command two-word phrases, but I imagine that data set would get large fast.
+In order to get this to run in a low memory environment of a web host, I *precompute semantic distance* against a corpus of common english words from [GloVe](https://nlp.stanford.edu/projects/glove/). This has the benefit of running with low memory on the web without pytorch, but the search only works for one-word searches.
+                            
+**February 2024 Update**: Thanks to llama.cpp and vector support in duckdb, I was able to [add multi-word search](https://github.com/astrowonk/emoji_finder/pull/7) I can generate new embeddings with llama.cpp and use the result in duckdb to find the most similar emojis.
 
 The `ComputeDistances` in `precompute.py` file writes to a sqlite database, which I think reduces memory usage. (It can also generate a series of .parquet files.)
 
