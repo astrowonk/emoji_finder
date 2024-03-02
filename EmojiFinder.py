@@ -130,7 +130,7 @@ class EmojiFinderSql(EmojiFinderCached):
         else:
             ##TODO we need to put the variant mapping into the main emoji_df table
             search = emoji.demojize(search)
-            if base_emoji := self.base_emoji_map.get(search):
+            if base_emoji := self.new_emoji_dict(search).get('text'):
                 search = base_emoji
             results = pd.read_sql(
                 "select * from combined_emoji where word = ? and label = base_emoji order by rank_of_search ;",
