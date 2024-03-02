@@ -5,6 +5,7 @@ import pandas as pd
 import dash_bootstrap_components as dbc
 
 from EmojiFinder import EmojiFinderSql, SKIN_TONE_SUFFIXES
+from emoji import demojize, is_emoji
 from ducklive import LiveSearch
 from pathlib import Path
 
@@ -58,8 +59,7 @@ tab1_content = dbc.Container(children=[
                 value='',
                 debounce=True,
                 autofocus=True,
-                placeholder=
-                'Search for emoji or try an emoji like 🎟️.',
+                placeholder='Search for emoji or try an emoji like 🎟️.',
             ),
         ],
                        style=STYLE),
@@ -245,17 +245,15 @@ def make_table_row(record, skin_tone, gender, font_size):
 )
 def search_results(search, skin_tone, gender, font_size):
     if search:
+        if is_emoji(search):
+            search = demojize(search)
+            if base_emoji := e.new_emoji_dict(search).get('text'):
+                search = base_emoji
         full_res = e.top_emojis(search)
         if full_res.empty:
             full_res = d.get_emoji(search)
         if full_res.empty:  # if it's still somehow empty
             return html.H3('No Results')
-
-        ## remove variants from list
-        #full_res = full_res.query("label not in @variants")
-        #  full_res['label'] = full_res['label'].apply(
-        #      lambda x: y if (y := e.base_emoji_map.get(x)) else x)
-        # full_res['label'] = full_res['base_emoji']
         full_res = full_res.drop_duplicates(subset=['label'])
         table_header = [
             html.Thead(html.Tr([html.Th("Description"),
