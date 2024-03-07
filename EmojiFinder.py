@@ -128,6 +128,6 @@ class EmojiFinderSql(EmojiFinderCached):
             params=(search, ))
         if not results.empty:
             return results.query(
-                'version <= 14.0')  ## move this into sql and add index?
+                'version <= 15.0')  ## move this into sql and add index?
         else:
             return pd.DataFrame(columns=['text', 'emoji'])

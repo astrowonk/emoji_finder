@@ -251,6 +251,7 @@ def search_results(search, skin_tone, gender, font_size):
                 search = base_emoji
         full_res = e.top_emojis(search)
         if full_res.empty:
+            print("No precomputed results. Using DuckLive")
             full_res = d.get_emoji(search)
         if full_res.empty:  # if it's still somehow empty
             return html.H3('No Results')
