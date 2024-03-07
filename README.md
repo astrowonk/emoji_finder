@@ -9,27 +9,18 @@ Inspired ([nerd sniped?](https://xkcd.com/356/)) by [this post](https://data-fol
 
 I'm using the python `sentence_tranformers` [package available from SBERT](https://www.sbert.net/index.html). This has a variety of [pretrained models suitable](https://www.sbert.net/docs/pretrained_models.htm) for the task of finding a semantic match between a search term and a target. I'm using the `all-mpnet-base-v2` model for the web apps.
 
-In order to get this to run in the low memory environment of [streamlit](https://share.streamlit.io), or on my [own web site under dash](http://marcoshuerta.com/dash/emoji_finder/), I made a version that uses *precomputed semantic distance* against a corpus of common english words (now ~35,000 words). This has the benefit of running with low memory on the web without pytorch, but the search only works for one-word searches. I may try to add common two-word phrases, but I imagine that data set would get large quickly.
+The web app now functions in two ways. The first is to precompute everything and store results for one-word search queries in sqlite. This uses *precomputed semantic distance* against a corpus of common english words (now 40,000 words). The top results are stored in a database in `all-mpnet-base-v2_main.db ` along with lookup tables, indices, and views that make looking up a word a [simple sql query](https://github.com/astrowonk/emoji_finder/blob/06ddc28c9f35458dd8d4e772cb9109530e86f616/EmojiFinder.py#L127).
 
-The `EmojiFinder` class in `EmojiFinderPytorch.py` live encodes the search term, but still has a pre-encoded vectors for the emojis. 
+For longer queries, I used the `precompute.py` file to generate `all-MiniLM-L6-v2` vectors which I store in the duckdb database `vectors.db`, now that DuckDB supports [fixed size arrays](https://duckdb.org/2024/02/13/announcing-duckdb-0100.html#fixed-length-arrays). Then the `LiveSearch` class can use `llama.cpp` to create a vector for the search term (thanks to new [BERT support in llama.cpp](https://github.com/ggerganov/llama.cpp/pull/5423)) and DuckDB can find the most similar emojis using cosine similarity with a short query:
 
-The dash app also includes a 2D projection of the `sentence_transformer` vectors via [UMAP](https://umap-learn.readthedocs.io/en/latest/). This shows the emojis as they relate to each other semantically. This is limited to 750 emoji on the graph at once, but more will appear as one zooms in on the plotly graph. Clicking on an emoji will display it with a button to copy to the clipboard.
-### Dash App Screen recording
-(older, pre-graph)
+```sql
+  select id,array_cosine_similarity(arr,?::DOUBLE[384]) as similarity,e.* from array_table a left join emoji_df e on a.id = e.idx where label = base_emoji order by similarity desc limit 25;"
+```
 
-https://user-images.githubusercontent.com/13702392/209137437-4014ab8f-ceac-4528-a73d-38147d9f32b4.mp4
-
+The dash app also includes a 2D projection of the `sentence_transformer` vectors via [UMAP](https://umap-learn.readthedocs.io/en/latest/). This shows the emojis as they relate to each other semantically. This is limited to 750 emoji on the graph at once, but more will appear as one zooms in on the plotly graph. Clicking on an emoji will display it with a button to copy to the clipboard. 
 
 
 TODO:
 
-* Make a config file so one can run it with the full pytorch-requiring library (which can handle longer search terms)
-* Add other preferences like filtering max emoji version, and emoji font size. (Currently hardcoded to 14 or lower.)
+* Add other preferences like filtering max emoji version.
 * Enhance the encoded text for emoji? A person with a laptop is called a "technologist"; if that had a better description, the search would be better at finding it. I'd need some alternate description info, however, not in the [python emoji library](https://pypi.org/project/emoji/)
-* Actually use Github issues and not this markdown list.
-~~* Add persistent preferences for surfacing prioritizing which genders and skin tones to put at top of search.~~
-* ~~Make a Dash version for more layout flexibility / persistent preferences. (Maybe)~~
-  * ~~Alternative : Figure out persistent preferences in Streamlit~~. 
-* ~~Group different gender and skin tone variants of the same emoji on the same line. (i.e. include with the top result e.g. :supervillain:)~~
-* ~~Add the scripts that build the pre-computed distances.~~
-* ~~Compute distances with other methods (dot product) and models (pre-computed distances currently using only `all-mpnet-base-v2`)~~

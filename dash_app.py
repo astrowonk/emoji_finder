@@ -5,11 +5,14 @@ import pandas as pd
 import dash_bootstrap_components as dbc
 
 from EmojiFinder import EmojiFinderSql, SKIN_TONE_SUFFIXES
+from emoji import demojize, is_emoji
+from ducklive import LiveSearch
 from pathlib import Path
 
 parent_dir = Path().absolute().stem
 
 e = EmojiFinderSql(db_name='all-mpnet-base-v2_main.db')
+d = LiveSearch(model_path='minilm-v6.gguf')
 
 app = Dash(__name__,
            url_base_pathname=f"/dash/{parent_dir}/",
@@ -56,8 +59,7 @@ tab1_content = dbc.Container(children=[
                 value='',
                 debounce=True,
                 autofocus=True,
-                placeholder=
-                'Search for emoji (mostly limited to single words; or try an emoji like 🎟️)',
+                placeholder='Search for emoji or try an emoji like 🎟️.',
             ),
         ],
                        style=STYLE),
@@ -124,7 +126,9 @@ Inspired ([nerd sniped?](https://xkcd.com/356/)) by [this post](https://data-fol
 
 I'm using the python `sentence_tranformers` [package available from SBERT](https://www.sbert.net/index.html). This has a variety of [pretrained models suitable](https://www.sbert.net/docs/pretrained_models.htm) for the task of finding a semantic match between a search term and a target. I'm using the `all-mpnet-base-v2` model for the web apps.
 
-In order to get this to run in a low memory environment of a web host, I *precompute semantic distance* against a corpus of common english words from [GloVe](https://nlp.stanford.edu/projects/glove/). This has the benefit of running with low memory on the web without pytorch, but the search only works for one-word searches. I may try to add command two-word phrases, but I imagine that data set would get large fast.
+In order to get this to run in a low memory environment of a web host, I *precompute semantic distance* against a corpus of common english words from [GloVe](https://nlp.stanford.edu/projects/glove/). This has the benefit of running with low memory on the web without pytorch, but the search only works for one-word searches.
+                            
+**February 2024 Update**: Thanks to llama.cpp and vector support in duckdb, I was able to [add multi-word search](https://github.com/astrowonk/emoji_finder/pull/7) I can generate new embeddings with llama.cpp and use the result in duckdb to find the most similar emojis.
 
 The `ComputeDistances` in `precompute.py` file writes to a sqlite database, which I think reduces memory usage. (It can also generate a series of .parquet files.)
 
@@ -241,16 +245,16 @@ def make_table_row(record, skin_tone, gender, font_size):
 )
 def search_results(search, skin_tone, gender, font_size):
     if search:
+        if is_emoji(search):
+            search = demojize(search)
+            if base_emoji := e.new_emoji_dict(search).get('text'):
+                search = base_emoji
         full_res = e.top_emojis(search)
         if full_res.empty:
+            print("No precomputed results. Using DuckLive")
+            full_res = d.get_emoji(search)
+        if full_res.empty:  # if it's still somehow empty
             return html.H3('No Results')
-        res_list = full_res.to_dict('records')
-
-        ## remove variants from list
-        #full_res = full_res.query("label not in @variants")
-        #  full_res['label'] = full_res['label'].apply(
-        #      lambda x: y if (y := e.base_emoji_map.get(x)) else x)
-        # full_res['label'] = full_res['base_emoji']
         full_res = full_res.drop_duplicates(subset=['label'])
         table_header = [
             html.Thead(html.Tr([html.Th("Description"),

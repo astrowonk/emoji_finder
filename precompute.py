@@ -121,17 +121,18 @@ class ComputeDistances:
         }).to_sql('emoji_df', con=con, index=False, if_exists='replace')
 
 
-class DuckTest:
-
-    def __init__(self, model_name='all-mpnet-base-v2') -> None:
-        self.model = SentenceTransformer(model_name)
-        self.con = duckdb.connect('vectors.db')
-
-    def get_emoji(self, text):
-        arr = self.model.encode(text).tolist()
-        return self.con.sql(
-            f"select id,array_cosine_similarity(arr,{arr}::DOUBLE[768]) as similarity,emoji from array_table a left join emoji_df e on a.id = e.idx order by similarity desc limit 20;"
-        ).to_df()
+def make_duckb_vectors():
+    c = ComputeDistances('all-MiniLM-L6-v2')
+    c.make_emoji_vectors()
+    array_list = c.vector_array_emoji_df.values.tolist()
+    con = duckdb.connect('vectors.db')
+    con.sql('CREATE or replace TABLE array_table (id INT, arr double[384])')
+    for i in range(1874):
+        sql = f"insert into array_table values({c.index_to_index[i]},{array_list[i]});"
+        con.sql(sql)
+    con.sql("create index array_id on array_table(id);")
+    con.commit()
+    con.close()
 
 
 if __name__ == '__main__':

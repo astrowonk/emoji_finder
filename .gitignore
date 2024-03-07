@@ -8,3 +8,4 @@ __pycache__/*
 nomic_embed.db
 *.db
 vectors.db.wal
+minilm-v6.gguf

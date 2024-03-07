@@ -120,24 +120,14 @@ class EmojiFinderSql(EmojiFinderCached):
         self.base_emoji_map = new_dict.copy()
 
     def top_emojis(self, search):
-        print('top emoji func=')
-        if not emoji.is_emoji(search):
-            search = search.strip().lower()
-            results = pd.read_sql(
-                "select * from combined_emoji where word = ?  and label = base_emoji order by rank_of_search;",
-                con=self.con,
-                params=(search, ))
-        else:
-            ##TODO we need to put the variant mapping into the main emoji_df table
-            search = emoji.demojize(search)
-            if base_emoji := self.base_emoji_map.get(search):
-                search = base_emoji
-            results = pd.read_sql(
-                "select * from combined_emoji where word = ? and label = base_emoji order by rank_of_search ;",
-                con=self.con,
-                params=(search, ))
+
+        search = search.strip().lower()
+        results = pd.read_sql(
+            "select * from combined_emoji where word = ?  and label = base_emoji order by rank_of_search;",
+            con=self.con,
+            params=(search, ))
         if not results.empty:
             return results.query(
-                'version <= 14.0')  ## move this into sql and add index?
+                'version <= 15.0')  ## move this into sql and add index?
         else:
             return pd.DataFrame(columns=['text', 'emoji'])
