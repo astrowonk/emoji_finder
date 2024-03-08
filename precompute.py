@@ -121,11 +121,11 @@ class ComputeDistances:
         }).to_sql('emoji_df', con=con, index=False, if_exists='replace')
 
 
-def make_duckb_vectors():
-    c = ComputeDistances('all-MiniLM-L6-v2')
+def make_duckb_vectors(model_name):
+    c = ComputeDistances(model_name)
     c.make_emoji_vectors()
     array_list = c.vector_array_emoji_df.values.tolist()
-    con = duckdb.connect('vectors.db')
+    con = duckdb.connect(f'{model_name}_vectors.db')
     con.sql('CREATE or replace TABLE array_table (id INT, arr double[384])')
     for i in range(len(array_list)):
         sql = f"insert into array_table values({c.index_to_index[i]},{array_list[i]});"

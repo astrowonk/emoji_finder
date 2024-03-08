@@ -64,7 +64,7 @@ class EmojiFinderCached():
         search = search.strip().lower()
         if (idx := self.vocab_dict.get(search)):
             return self.emoji_df.iloc[(
-                self.distances[idx])].query('version <= 14.0')
+                self.distances[idx])].query('version <= 15.0')
         else:
             return pd.DataFrame(columns=['text', 'emoji'])
 
