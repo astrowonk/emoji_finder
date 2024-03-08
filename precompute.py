@@ -127,7 +127,7 @@ def make_duckb_vectors():
     array_list = c.vector_array_emoji_df.values.tolist()
     con = duckdb.connect('vectors.db')
     con.sql('CREATE or replace TABLE array_table (id INT, arr double[384])')
-    for i in range(1874):
+    for i in range(len(array_list)):
         sql = f"insert into array_table values({c.index_to_index[i]},{array_list[i]});"
         con.sql(sql)
     con.sql("create index array_id on array_table(id);")
