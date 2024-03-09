@@ -247,10 +247,8 @@ def search_results(search, skin_tone, gender, font_size):
     if not search:
         return html.H3('No Results')
 
-    if len(search) > 400:
-        return html.H3("String too long")
-    if len(search.split()) >= 60:
-        return html.H3("Too many words, use a shorter phrase.")
+    if len(search) > 400 or len(search.split()) > 60:
+        return html.H3("Search query exceeds 400 characters or 60 words.")
     if is_emoji(search):
         search = demojize(search)
         if base_emoji := e.new_emoji_dict(search).get('text'):
