@@ -123,7 +123,9 @@ tab2_content = dbc.Row([
 
 tab3_content = dcc.Markdown("""
 
-Inspired ([nerd sniped?](https://xkcd.com/356/)) by [this post](https://data-folks.masto.host/@archie/109543055657581394) on Mastodon, I have created this effort to do semantic searching for emoji. So, you can search for `flower`, and also get `bouquet` 💐, and `cherry blossom` 🌸. (The iOS emoji keyboard does something similar, but this remains unavailable on MacOS.)
+Source code for this app and underlying modules in the [github repository](https://github.com/astrowonk/emoji_finder).
+
+Inspired ([nerd sniped?](https://xkcd.com/356/)) by [this post](https://data-folks.masto.host/@archie/109543055657581394) on Mastodon, I made this Semantic Emoji Finder. So, you can search for `flower`, and also get `bouquet` 💐, and `cherry blossom` 🌸. (The iOS emoji keyboard does something similar, but this remains unavailable on MacOS.)
 
 I'm using the python `sentence_tranformers` [package available from SBERT](https://www.sbert.net/index.html). This has a variety of [pretrained models suitable](https://www.sbert.net/docs/pretrained_models.htm) for the task of finding a semantic match between a search term and a target. I'm using the `all-mpnet-base-v2` model for the web apps.
 
@@ -133,7 +135,6 @@ In order to get this to run in a low memory environment of a web host, I *precom
 
 The dash app also includes a 2D projection of the `sentence_transformer` vectors via [UMAP](https://umap-learn.readthedocs.io/en/latest/). This shows the emojis as they relate to each other semantically. This is limited to 750 emoji, but more will appear as one zooms in on the plotly graph. Clicking on an emoji will display it with a button to copy to the clipboard.
 
-Source code, sqlitedb, etc. on [my emoji finder github repository](https://github.com/astrowonk/emoji_finder).
 
 """,
                             style=STYLE)
