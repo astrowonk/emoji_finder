@@ -244,32 +244,34 @@ def make_table_row(record, skin_tone, gender, font_size):
     Input('font-size-slider', 'value'),
 )
 def search_results(search, skin_tone, gender, font_size):
-    if search:
-        if is_emoji(search):
-            search = demojize(search)
-            if base_emoji := e.new_emoji_dict(search).get('text'):
-                search = base_emoji
-        full_res = e.top_emojis(search)
-        if full_res.empty:
-            print("No precomputed results. Using DuckLive")
-            full_res = d.get_emoji(search)
-        if full_res.empty:  # if it's still somehow empty
-            return html.H3('No Results')
-        full_res = full_res.drop_duplicates(subset=['label'])
-        table_header = [
-            html.Thead(html.Tr([html.Th("Description"),
-                                html.Th("Emoji")]))
-        ]
-        table_rows = [
-            make_table_row(rec, skin_tone, gender, font_size)
-            for rec in full_res.to_dict('records')
-        ]
-        table_body = [html.Tbody(table_rows)]
-        return dbc.Table(table_header + table_body,
-                         bordered=False,
-                         striped=True)
+    if not search:
+        return html.H3('No Results')
 
-    return html.H3('No Results')
+    if len(search) > 400:
+        return html.H3("String too long")
+    if len(search.split()) >= 60:
+        return html.H3("Too many words, use a shorter phrase.")
+    if is_emoji(search):
+        search = demojize(search)
+        if base_emoji := e.new_emoji_dict(search).get('text'):
+            search = base_emoji
+    full_res = e.top_emojis(search)
+    if full_res.empty:
+        print("No precomputed results. Using DuckLive")
+        full_res = d.get_emoji(search)
+    if full_res.empty:  # if it's still somehow empty
+        return html.H3('No Results')
+    full_res = full_res.drop_duplicates(subset=['label'])
+    table_header = [
+        html.Thead(html.Tr([html.Th("Description"),
+                            html.Th("Emoji")]))
+    ]
+    table_rows = [
+        make_table_row(rec, skin_tone, gender, font_size)
+        for rec in full_res.to_dict('records')
+    ]
+    table_body = [html.Tbody(table_rows)]
+    return dbc.Table(table_header + table_body, bordered=False, striped=True)
 
 
 @app.callback(
