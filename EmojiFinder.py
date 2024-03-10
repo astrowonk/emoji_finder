@@ -1,6 +1,5 @@
 import pandas as pd
 import sqlite3
-import emoji
 
 SKIN_TONE_SUFFIXES = [
     'medium-light_skin_tone',
