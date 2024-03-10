@@ -38,7 +38,7 @@ class ComputeDistances:
         emoji_dict = self.emoji_data.set_index('label')['text'].to_dict()
         no_variants = [
             x for x in self.emoji_data['label'].to_list()
-            if not 'skin_tone' in x
+            if 'skin_tone' not in x
         ]
         #  no_variants = [x for x in no_variants if not (x.startswith(':woman'))]
         # no_variants = [x for x in no_variants ]
