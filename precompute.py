@@ -23,7 +23,9 @@ class ComputeDistances:
         self.emoji_data = pd.read_parquet(
             'emoji_df_improved.parquet'
         )  # dataframe of emojis and their descriptions
-        if torch.backends.mps.is_available():
+        if torch.backends.mps.is_available(
+        ):  #use metal back end if available (on an Apple Silicon Mac)
+            #I probably should add a similar hook  for CUDA but this is fast enough it doesn't really need CUDA
             self.model = SentenceTransformer(model_name,
                                              device=torch.device('mps'),
                                              trust_remote_code=True)
