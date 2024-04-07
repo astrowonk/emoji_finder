@@ -20,7 +20,8 @@ For longer queries, I used the `precompute.py` file to generate `all-MiniLM-L6-v
 The dash app also includes a 2D projection of the `sentence_transformer` vectors via [UMAP](https://umap-learn.readthedocs.io/en/latest/). This shows the emojis as they relate to each other semantically. This is limited to 750 emoji on the graph at once, but more will appear as one zooms in on the plotly graph. Clicking on an emoji will display it with a button to copy to the clipboard. 
 
 
-TODO:
+## TODO
 
-* Add other preferences like filtering max emoji version.
-* Enhance the encoded text for emoji? A person with a laptop is called a "technologist"; if that had a better description, the search would be better at finding it. I'd need some alternate description info, however, not in the [python emoji library](https://pypi.org/project/emoji/)
+I'm not sure if all the code needed to recreate the databases is all actually in this repository. I went from caching the vectors in parquet to SQlite, and then added duckdb. My main todo is to clean this up so it's clear what needs to be run in `precompute.py` to generate the databases and models needed for the Dash app to run properly.
+
+
