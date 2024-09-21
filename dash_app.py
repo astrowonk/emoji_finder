@@ -143,8 +143,7 @@ In order to get this to run in a low memory environment of a web host, I *precom
                             
 **February 2024 Update**: Thanks to llama.cpp and vector support in duckdb, I was able to [add multi-word search](https://github.com/astrowonk/emoji_finder/pull/7). I can now generate new embeddings with llama.cpp for a query, and use the result to query duckdb to find the most similar emojis. This runs only if the one-word pre-computed search returns no results.
 
-The dash app also includes a 2D projection of the `sentence_transformer` vectors via [UMAP](https://umap-learn.readthedocs.io/en/latest/). This shows the emojis as they relate to each other semantically. This is limited to 750 emoji, but more will appear as one zooms in on the plotly graph. Clicking on an emoji will display it with a button to copy to the clipboard.
-
+**September 2024 Update**: Now includes emoji through Version 15.1**
 
 """,
     style=STYLE,
