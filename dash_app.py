@@ -153,7 +153,7 @@ The dash app also includes a 2D projection of the `sentence_transformer` vectors
 tabs = dbc.Tabs(
     [
         dbc.Tab(tab1_content, label='Search', tab_id='search-tab'),
-        dbc.Tab(tab2_content, label='Graph', tab_id='graph-tab'),
+        #   dbc.Tab(tab2_content, label='Graph', tab_id='graph-tab'),
         dbc.Tab(tab3_content, label='About'),
     ],
     active_tab='search-tab',
@@ -306,43 +306,6 @@ def button_action(state, n_clicks):
     if not n_clicks:
         raise PreventUpdate
     return not state
-
-
-@app.callback(
-    Output('my-graph', 'figure'),
-    Input('my-graph', 'relayoutData'),
-)
-def make_graph(data):
-    x_min, x_max = -20.0, 20.0
-    y_min, y_max = -20.0, 20.0
-    if data is not None and data.get('xaxis.range[0]'):
-        x_min, x_max = data['xaxis.range[0]'], data['xaxis.range[1]']
-        y_min, y_max = data['yaxis.range[0]'], data['yaxis.range[1]']
-        print(x_min, x_max)
-
-    df = pd.read_sql(
-        f'select * from emoji_umap where  A between {x_min:.3f} and {x_max:.37} and B between {y_min:.3f} and  {y_max:.3f}  order by RANDOM() limit 600;',
-        con=e.con,
-    )
-    fig = df.plot.scatter(
-        x='A',
-        y='B',
-        text='emoji',
-        hover_data=['index'],
-        backend='plotly',
-        labels={'A': '', 'B': ''},
-        template='plotly_white',
-    )
-    if data is not None and data.get('xaxis.range[0]'):
-        fig.update_xaxes(range=[x_min, x_max])
-        fig.update_yaxes(range=[y_min, y_max])
-    fig.update_layout(
-        font=dict(
-            size=24,  # Set the font size here
-        )
-    )
-    # fig.update_traces(textfont_size=14)
-    return fig
 
 
 @app.callback(
