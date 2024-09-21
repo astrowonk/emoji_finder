@@ -9,3 +9,5 @@ nomic_embed.db
 *.db
 vectors.db.wal
 minilm-v6.gguf
+*.backup
+all-mpnet-base-v2_main.db
