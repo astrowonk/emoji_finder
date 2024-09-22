@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
 import duckdb
+from EmojiFinder import EmojiFinderCached
 
 
 class ComputeDistances:
@@ -130,6 +131,15 @@ def make_duckb_vectors(model_name):
     con.sql('create index array_id on array_table(id);')
     con.commit()
     con.close()
+
+
+def make_variant_map(no_variants, all_labels):
+    print(len(no_variants))
+    new_dict = {}
+    for non_variant in no_variants:
+        the_variants = EmojiFinderCached.add_variants(non_variant, all_labels)
+        new_dict.update({var: non_variant for var in the_variants})
+    return new_dict
 
 
 if __name__ == '__main__':

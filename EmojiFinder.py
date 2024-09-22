@@ -14,6 +14,10 @@ def flatten_list(list_of_lists):
     return [y for x in list_of_lists for y in x]
 
 
+def filter_list(list1, all_labels):
+    return sorted(list(set(list1).intersection(all_labels)))
+
+
 class EmojiFinderCached:
     def __init__(self, model_name='all-mpnet-base-v2'):
         self.emoji_df = pd.read_parquet('emoji_df_improved.parquet')
@@ -23,10 +27,8 @@ class EmojiFinderCached:
         self.vocab_dict = vocab_df.set_index('word')['idx'].to_dict()
         self.distances = pd.read_parquet(f'semantic_distances_{model_name}.parquet').values
 
-    def filter_list(self, list1):
-        return sorted(list(set(list1).intersection(self.emoji_df['label'].tolist())))
-
-    def add_variants(self, base_label):
+    @staticmethod
+    def add_variants(base_label, all_labels):
         # print(base_label)
         base_search = base_label[1:-1]
         if base_search in SKIN_TONE_SUFFIXES:
@@ -55,11 +57,11 @@ class EmojiFinderCached:
 
         #        print(len(variants))
         return (
-            self.filter_list(variants)
-            + self.filter_list(woman_variants)
-            + self.filter_list(man_variants)
-            + self.filter_list(person_variants)
-            + self.filter_list(extra_suffixes)
+            filter_list(variants, all_labels)
+            + filter_list(woman_variants, all_labels)
+            + filter_list(man_variants, all_labels)
+            + filter_list(person_variants, all_labels)
+            + filter_list(extra_suffixes, all_labels)
         )
 
     def top_emojis(self, search):
@@ -115,15 +117,6 @@ class EmojiFinderSql(EmojiFinderCached):
 
     def filter_list(self, list1):
         return sorted(list(set(list1).intersection(self.all_labels)))
-
-    def make_variant_map(self):
-        no_variants = pd.read_csv('no_variant_list.txt')['word'].tolist()
-        print(len(no_variants))
-        new_dict = {}
-        for non_variant in no_variants:
-            the_variants = self.add_variants(non_variant)
-            new_dict.update({var: non_variant for var in the_variants})
-        self.base_emoji_map = new_dict.copy()
 
     def top_emojis(self, search):
         search = search.strip().lower()

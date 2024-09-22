@@ -307,35 +307,5 @@ def button_action(state, n_clicks):
     return not state
 
 
-@app.callback(
-    Output('emoji-result', 'children'),
-    Input('my-graph', 'clickData'),
-    Input('font-size-slider', 'value'),
-    State('skin-tone', 'value'),
-    State('gender', 'value'),
-)
-def custom_copy(click_data, fs, skin_tone, gender):
-    if click_data and click_data.get('points', []):
-        first_point = click_data['points'][0]
-        try:
-            theemoji = first_point['customdata'][0]
-        except KeyError:
-            print('key error')
-            theemoji = None
-            raise PreventUpdate
-        print(f'returning {theemoji}')
-        return make_cell(
-            {
-                'label': theemoji,
-                'emoji': e.new_emoji_dict(theemoji)['emoji'],
-                'text': 'the-clicked-emoji',
-            },
-            skin_tone,
-            gender,
-            fs,
-        )  # includes headers
-    raise PreventUpdate
-
-
 if __name__ == '__main__':
     app.run_server(debug=True)
