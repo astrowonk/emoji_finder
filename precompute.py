@@ -45,11 +45,13 @@ class ComputeDistances:
         text_list = [self.emoji_prefix + x for x in text_list]
         self.vector_array_emoji = self.model.encode(text_list)
         self.vector_array_emoji_df = pd.DataFrame(self.vector_array_emoji)
+        self.vector_array_emoji_df.index = no_variants
         self.vector_array_emoji_df.columns = [
             str(x) for x in self.vector_array_emoji_df.columns
         ]  ## parquet needs string columns
         map_index_orig = {key: i for i, key in enumerate(emoji_dict.keys())}
         map_index_limited = {i: key for i, key in enumerate(no_variants)}
+        self.map_index_limited = map_index_limited
         self.index_to_index = {
             i: map_index_orig[map_index_limited[i]] for i in range(len(no_variants))
         }
@@ -80,30 +82,34 @@ class ComputeDistances:
                 self.vector_array_search_terms, self.vector_array_emoji
             ).numpy()
 
+        self.raw_distances = distances
+
         top_n = np.argsort(-distances)[:, 0:n]
         self.distance_df = pd.DataFrame(top_n)
         self.distance_df.columns = [str(x) for x in self.distance_df.columns]
 
     def save_all(self):
         self.distance_df.to_parquet(
-            f'semantic_distances_{self.model_name}.parquet'
+            f'semantic_distances_{self.model_name.replace("/","-")}.parquet'
         )  # precomputed top 25 indices of matching emojis
         self.vocab_df.to_parquet(
-            f'vocab_df_{self.model_name}.parquet'
+            f'vocab_df_{self.model_name.replace("/","-")}.parquet'
         )  # matches indices to the emoji itself (could combine into a single lookup dict)
         self.vector_array_emoji_df.to_parquet(
-            f'emoji_vectors_{self.model_name}.parquet'
+            f'emoji_vectors_{self.model_name.replace("/","-")}.parquet'
         )  ## needed to speed up live encoding
         ## of the search terms, only need to model.encode(search).
 
     def save_emoji_vectors_only(self):
-        self.distance_df.to_parquet(f'semantic_distances_{self.model_name}.parquet')
-        self.distance_df.to_parquet(f'vocab_df_{self.model_name}.parquet')
+        self.distance_df.to_parquet(
+            f'semantic_distances_{self.model_name.replace("/","-")}.parquet'
+        )
+        self.distance_df.to_parquet(f'vocab_df_{self.model_name.replace("/","-")}.parquet')
 
     def make_database(self, db_name=None):
         """Need to test this!"""
         if not db_name:
-            db_name = f'{self.model_name}_main.db'
+            db_name = f'{self.model_name.replace("/","-")}_main.db'
         con = create_engine(f'sqlite:///{db_name}')
         self.distance_df.index = self.vocab_df['word']
         new_df = self.distance_df.T
