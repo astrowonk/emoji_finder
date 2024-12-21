@@ -75,13 +75,10 @@ class EmojiFinderCached:
 class EmojiFinderSql(EmojiFinderCached):
     def __init__(self, db_name='all-mpnet-base-v2_main.db'):
         self.db_name = db_name
-        print('Begin init of class')
         # self.con = sqlite3.connect(
         #    'main.db')  #change later, name should have model type in it
 
         # self.base_emoji_map = self.make_variant_map()
-
-        print('end init of class')
 
     def prep_for_variant_map(self):
         self.all_labels = pd.read_sql('select distinct label from emoji_df;', con=self.con)[
