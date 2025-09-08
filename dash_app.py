@@ -308,4 +308,4 @@ def button_action(state, n_clicks):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run(debug=True)

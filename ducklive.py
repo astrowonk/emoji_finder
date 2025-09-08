@@ -11,9 +11,21 @@ class LiveSearch:
         self.get_emoji = lru_cache(maxsize=None)(self._get_emoji)
 
     def _get_emoji(self, text):
-        arr = self.model.create_embedding(text)['data'][0]['embedding']
+        arr = self.model.embed(text)
 
         return self.con.sql(
-            'select id,array_cosine_similarity(arr,?::DOUBLE[384]) as similarity,e.* from array_table a left join emoji_df e on a.id = e.idx where label = base_emoji order by similarity desc limit 25;',
+            """select
+	id,
+	array_cosine_similarity(arr,?::DOUBLE[384]) as similarity,
+	e.*
+from
+	array_table a
+left join emoji_df e on
+	a.id = e.idx
+where
+	label = base_emoji
+order by
+	similarity desc
+limit 25;""",
             params=(arr,),
         ).to_df()
