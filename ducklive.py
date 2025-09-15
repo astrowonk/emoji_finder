@@ -8,7 +8,7 @@ class LiveSearch:
         self.model = llama_cpp.Llama(model_path=model_path, embedding=True, verbose=False)
 
         self.con = duckdb.connect('vectors.db', read_only=True)
-        self.get_emoji = cache(maxsize=None)(self._get_emoji)
+        self.get_emoji = cache(self._get_emoji)
 
     def _get_emoji(self, search):
         search_vector = self.model.embed(search)
